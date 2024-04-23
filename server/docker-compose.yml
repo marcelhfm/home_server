@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  tcp_server:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "5003:5000"
+    environment:
+      - PQ_HOST=${PQ_HOST}
+      - PQ_PORT=${PQ_PORT}
+      - PQ_USER=${PQ_USER}
+      - PQ_PASSWORD=${PQ_PASSWORD}
+      - PQ_DBNAME=${PQ_DBNAME}

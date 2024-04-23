@@ -65,7 +65,7 @@ func init_pq() *sql.DB {
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		fmt.Printf("Error loading .env file: %s", err)
 	}
 
 	db := init_pq()
@@ -117,7 +117,7 @@ func handleRequest(conn net.Conn, db *sql.DB) {
 			_, err = db.Exec(sqlStatement, datasourceId, picow_value_descr[i], value)
 
 			if err != nil {
-				log.Fatal(err)
+				fmt.Printf("An error occured while trying to insert into database: %s", err)
 			}
 		}
 		fmt.Println("Successfully inserted message")
