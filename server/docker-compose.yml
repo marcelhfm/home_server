@@ -13,3 +13,4 @@ services:
       - PQ_USER=${PQ_USER}
       - PQ_PASSWORD=${PQ_PASSWORD}
       - PQ_DBNAME=${PQ_DBNAME}
+    restart: unless-stopped

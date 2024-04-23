@@ -65,7 +65,7 @@ func init_pq() *sql.DB {
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		fmt.Printf("Error loading .env file: %s", err)
+		fmt.Printf("Error loading .env file: %s\n", err)
 	}
 
 	db := init_pq()
