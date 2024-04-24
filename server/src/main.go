@@ -57,7 +57,7 @@ func init_pq() *sql.DB {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Successfully connected to db")
+	fmt.Println("Successfully connected to db!")
 
 	return db
 }
