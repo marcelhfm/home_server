@@ -20,7 +20,7 @@ var picow_value_descr = [...]string{"datasourceId", "co2", "temperature", "humid
 var connections = make(map[int]net.Conn)
 var mut sync.Mutex
 
-func StartTCPServer(db *sql.DB, commandChannel <-chan http.CommandRequest) {
+func StartTCPServer(db *sql.DB, commandChannel <-chan http.CommandRequest, commandResponseChannel chan<- http.CommandResponse) {
 	ln, err := net.Listen("tcp", ":5001")
 	if err != nil {
 		fmt.Println("tcp: Error listening:", err.Error())
@@ -51,9 +51,21 @@ func StartTCPServer(db *sql.DB, commandChannel <-chan http.CommandRequest) {
 
 		if ok {
 			fmt.Printf("tcp: Sending command: %d to datasource: %d\n", command.Command, command.DatasourceId)
-			sendCommand(conn, command.Command)
+			err := sendCommand(conn, command.Command)
+			commandResponseChannel <- http.CommandResponse{
+				Id:           command.Id,
+				Command:      command.Command,
+				DatasourceId: command.DatasourceId,
+				Error:        err,
+			}
 		} else {
 			fmt.Printf("tcp: No connection found for datasource: %d\n", command.DatasourceId)
+			commandResponseChannel <- http.CommandResponse{
+				Id:           command.Id,
+				Command:      command.Command,
+				DatasourceId: command.DatasourceId,
+				Error:        fmt.Errorf("Connection does not exist"),
+			}
 		}
 	}
 }
@@ -133,7 +145,7 @@ func parseCsv(message string) []int {
 	return intValues
 }
 
-func sendCommand(conn net.Conn, command int) {
+func sendCommand(conn net.Conn, command int) error {
 	writer := bufio.NewWriter(conn)
 
 	message := fmt.Sprintf("%d\n", command)
@@ -141,11 +153,14 @@ func sendCommand(conn net.Conn, command int) {
 	_, err := writer.WriteString(message)
 	if err != nil {
 		fmt.Println("tcp: Error writing command to connection:", err)
-		return
+		return err
 	}
 
 	err = writer.Flush()
 	if err != nil {
 		fmt.Println("tcp: Error flushing writer:", err)
+		return err
 	}
+
+	return nil
 }

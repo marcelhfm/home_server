@@ -21,7 +21,8 @@ func main() {
 	defer db.Close()
 
 	commandChannel := make(chan http.CommandRequest)
+	commandResponseChannel := make(chan http.CommandResponse)
 
-	go tcp.StartTCPServer(db, commandChannel)
-	http.StartHttpServer(commandChannel)
+	go tcp.StartTCPServer(db, commandChannel, commandResponseChannel)
+	http.StartHttpServer(commandChannel, commandResponseChannel)
 }

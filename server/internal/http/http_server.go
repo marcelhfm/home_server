@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
 var commandMap = map[string]int{
@@ -19,17 +21,25 @@ type CommandBody struct {
 }
 
 type CommandRequest struct {
+	Id           uuid.UUID
 	Command      int
 	DatasourceId int
 }
 
-func StartHttpServer(commandChannel chan<- CommandRequest) {
-	http.HandleFunc("POST /api/datasource/command/", sendCommandHandler(commandChannel))
+type CommandResponse struct {
+	Id           uuid.UUID
+	Command      int
+	DatasourceId int
+	Error        error
+}
+
+func StartHttpServer(commandChannel chan<- CommandRequest, commandResponseChannel <-chan CommandResponse) {
+	http.HandleFunc("POST /api/datasource/command/", sendCommandHandler(commandChannel, commandResponseChannel))
 	fmt.Println("Http Server listening on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func sendCommandHandler(commandChannel chan<- CommandRequest) http.HandlerFunc {
+func sendCommandHandler(commandChannel chan<- CommandRequest, commandResponseChannel <-chan CommandResponse) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			fmt.Println("http: Received request with wrong method")
@@ -62,6 +72,7 @@ func sendCommandHandler(commandChannel chan<- CommandRequest) http.HandlerFunc {
 		}
 
 		rq := CommandRequest{
+			Id:           uuid.New(),
 			Command:      commandCode,
 			DatasourceId: datasourceId,
 		}
@@ -69,6 +80,13 @@ func sendCommandHandler(commandChannel chan<- CommandRequest) http.HandlerFunc {
 		log.Printf("Send command %d to datasource with id: %d", rq.Command, rq.DatasourceId)
 		commandChannel <- rq
 
-		fmt.Fprintf(w, "Sent data to datasoruce with id: %s", id)
+		response := <-commandResponseChannel
+
+		if response.Error != nil {
+			http.Error(w, response.Error.Error(), http.StatusInternalServerError)
+		} else {
+			fmt.Fprintf(w, "Command %s sent to datasource %d successfully.", c.Command, datasourceId)
+		}
+
 	}
 }
