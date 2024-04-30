@@ -67,19 +67,31 @@ func handleConnection(conn net.Conn, pg_db *sql.DB) {
 
 	for {
 		message, err := reader.ReadString('\n')
+
 		if err != nil {
-			fmt.Println("tcp: Error reading: ", err.Error())
-			break
+			fmt.Printf("tcp: Error on connection for datasource %d: %s\n", datasourceId, err.Error())
+			mut.Lock()
+			if current, ok := connections[datasourceId]; ok && current == conn {
+				delete(connections, datasourceId)
+				fmt.Printf("tcp: Removed connection for datasource %d due to error\n", datasourceId)
+			}
+			mut.Unlock()
+			conn.Close()
+			return
 		}
+
 		fmt.Printf("tcp: Received message: %s", message)
 		values := parseCsv(message)
 
 		if isFirstMessage {
 			datasourceId = values[0]
 			mut.Lock()
-			if _, exists := connections[datasourceId]; exists {
+			exitingConn, exists := connections[datasourceId]
+			if exists {
 				fmt.Printf("tcp: Connection updated for datasource %d\n", datasourceId)
-				connections[datasourceId].Close()
+				if exitingConn != conn {
+					exitingConn.Close()
+				}
 			} else {
 				fmt.Printf("tcp: New Connection added for datasource %d\n", datasourceId)
 			}
