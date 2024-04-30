@@ -77,6 +77,12 @@ func handleConnection(conn net.Conn, pg_db *sql.DB) {
 		if isFirstMessage {
 			datasourceId = values[0]
 			mut.Lock()
+			if _, exists := connections[datasourceId]; exists {
+				fmt.Printf("tcp: Connection updated for datasource %d\n", datasourceId)
+				connections[datasourceId].Close()
+			} else {
+				fmt.Printf("tcp: New Connection added for datasource %d\n", datasourceId)
+			}
 			connections[datasourceId] = conn
 			mut.Unlock()
 			isFirstMessage = false
@@ -94,6 +100,8 @@ func handleConnection(conn net.Conn, pg_db *sql.DB) {
 	mut.Lock()
 	delete(connections, datasourceId)
 	mut.Unlock()
+	conn.Close()
+	fmt.Printf("tcp: Closed and removed connection for datasource %d\n", datasourceId)
 }
 
 func parseCsv(message string) []int {
