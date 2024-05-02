@@ -47,15 +47,15 @@
                 "value": 1000
               },
               {
-                "color": "semi-dark-green",
+                "color": "yellow",
                 "value": 1200
               },
               {
-                "color": "#EAB839",
+                "color": "orange",
                 "value": 1500
               },
               {
-                "color": "orange",
+                "color": "semi-dark-orange",
                 "value": 1800
               },
               {
@@ -297,7 +297,6 @@
                 "type": "groupBy"
               }
             ],
-            "limit": null,
             "orderBy": {
               "property": {
                 "name": "\"timestamp\"",
@@ -358,13 +357,14 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "continuous-GrYlRd",
+            "mode": "thresholds",
             "seriesBy": "last"
           },
           "custom": {
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
+            "axisLabel": "",
             "axisPlacement": "auto",
             "axisSoftMax": 2500,
             "axisSoftMin": 0,
@@ -489,7 +489,6 @@
                 "type": "groupBy"
               }
             ],
-            "limit": null,
             "orderBy": {
               "property": {
                 "name": "\"timestamp\"",
@@ -537,7 +536,15 @@
       "transformations": [
         {
           "id": "convertFieldType",
-          "options": {}
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "number",
+                "targetField": "value"
+              }
+            ],
+            "fields": {}
+          }
         }
       ],
       "type": "timeseries"
@@ -663,7 +670,6 @@
                 "type": "groupBy"
               }
             ],
-            "limit": null,
             "orderBy": {
               "property": {
                 "name": "\"timestamp\"",
@@ -731,6 +737,6 @@
   "timezone": "browser",
   "title": "PicoW Co2",
   "uid": "adkhtnidh6134a",
-  "version": 8,
+  "version": 11,
   "weekStart": ""
 }
