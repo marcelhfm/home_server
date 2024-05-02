@@ -1,7 +1,11 @@
-:80 {
-  reverse_proxy /api/* server:8080
-  reverse_proxy /grafana/* grafana:3000 {
-    uri stip_prefix /grafana
+{
+  log {
+    level DEBUG
   }
+}
+
+:8085 {
+  reverse_proxy /api/* server:8080
+  reverse_proxy /grafana/* grafana:3000
   reverse_proxy /db timescaledb:5432
 }
