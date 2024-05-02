@@ -1,0 +1,66 @@
+version: "3.8"
+
+services:
+  timescaledb:
+    image: timescale/timescaledb:latest-pg14
+    container_name: timescaledb
+    environment:
+      - POSTGRES_DB=timescale
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - timescaledb-data:/var/lib/postgresql/data
+    restart: always
+
+  grafana:
+    image: grafana/grafana:latest
+    env_file:
+      - .env
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+      - GF_SERVER_DOMAIN=${GF_SERVER_DOMAIN}
+      - GF_SERVER_ROOT_URL=${GF_SERVER_ROOT_URL}
+    volumes:
+      - grafana_data:/var/lib/grafana
+    restart: always
+    depends_on:
+      - timescaledb
+
+  server:
+    build: ./server
+    env_file:
+      - .env
+    ports:
+      - "5001:5001"
+    environment:
+      - PQ_HOST=${PQ_HOST}
+      - PQ_PORT=${PQ_PORT}
+      - PQ_USER=${PQ_USER}
+      - PQ_PASSWORD=${PQ_PASSWORD}
+      - PQ_DBNAME=${PQ_DBNAME}
+    restart: always
+
+  caddy:
+    image: caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: always
+    depends_on:
+      - server
+      - grafana
+
+volumes:
+  timescaledb-data:
+    driver: local
+  grafana_data:
+    driver: local
+  caddy_data:
+    driver: local
+  caddy_config:
+    driver: local
