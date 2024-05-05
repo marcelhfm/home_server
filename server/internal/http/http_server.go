@@ -8,7 +8,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/a-h/templ"
 	"github.com/google/uuid"
+
+	"github.com/marcelhfm/home_server/views"
 )
 
 var commandMap = map[string]int{
@@ -34,6 +37,7 @@ type CommandResponse struct {
 }
 
 func StartHttpServer(commandChannel chan<- CommandRequest, commandResponseChannel <-chan CommandResponse) {
+	http.Handle("/", templ.Handler(views.Index()))
 	http.HandleFunc("POST /api/datasource/command/", sendCommandHandler(commandChannel, commandResponseChannel))
 	fmt.Println("Http Server listening on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
