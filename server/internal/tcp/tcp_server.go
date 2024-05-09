@@ -11,7 +11,7 @@ import (
 	"sync"
 
 	"github.com/marcelhfm/home_server/internal/db"
-	"github.com/marcelhfm/home_server/internal/http"
+	"github.com/marcelhfm/home_server/pkg/types"
 )
 
 // TODO: Store this information in the db
@@ -20,7 +20,7 @@ var picow_value_descr = [...]string{"datasourceId", "co2", "temperature", "humid
 var connections = make(map[int]net.Conn)
 var mut sync.Mutex
 
-func StartTCPServer(db *sql.DB, commandChannel <-chan http.CommandRequest, commandResponseChannel chan<- http.CommandResponse) {
+func StartTCPServer(db *sql.DB, commandChannel <-chan types.CommandRequest, commandResponseChannel chan<- types.CommandResponse) {
 	ln, err := net.Listen("tcp", ":5001")
 	if err != nil {
 		fmt.Println("tcp: Error listening:", err.Error())
@@ -52,7 +52,7 @@ func StartTCPServer(db *sql.DB, commandChannel <-chan http.CommandRequest, comma
 		if ok {
 			fmt.Printf("tcp: Sending command: %d to datasource: %d\n", command.Command, command.DatasourceId)
 			err := sendCommand(conn, command.Command)
-			commandResponseChannel <- http.CommandResponse{
+			commandResponseChannel <- types.CommandResponse{
 				Id:           command.Id,
 				Command:      command.Command,
 				DatasourceId: command.DatasourceId,
@@ -60,7 +60,7 @@ func StartTCPServer(db *sql.DB, commandChannel <-chan http.CommandRequest, comma
 			}
 		} else {
 			fmt.Printf("tcp: No connection found for datasource: %d\n", command.DatasourceId)
-			commandResponseChannel <- http.CommandResponse{
+			commandResponseChannel <- types.CommandResponse{
 				Id:           command.Id,
 				Command:      command.Command,
 				DatasourceId: command.DatasourceId,

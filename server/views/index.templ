@@ -1,22 +1,29 @@
 package views
 
 import (
-  "github.com/marcelhfm/home_server/views/components"
+  "github.com/marcelhfm/home_server/views/components/header"
+  "github.com/marcelhfm/home_server/views/components/datasource-card"
+  "github.com/marcelhfm/home_server/pkg/types"
+	"strconv"
 )
 
-templ Index() {
+templ Index(datasources []types.Datasource) {
  <!DOCTYPE html>
     <html lang="en">
-        @components.Header()
+        @header.Header()
         <body>
             <main class="min-h-screen w-full">
                 <nav class="flex w-full border border-b-zinc-200 px-4 py-4">
                     <h3 class="text-base lg:text-lg font-medium text-center">
-                        GO Fullstack app
+                      Pihome
                     </h3>
                 </nav>
-              
-              </main>
+                <div class="p-4">
+                for _, datasource := range datasources {
+                  @datasource_card.DatasourceCard(datasource.Name, strconv.Itoa(datasource.Id))
+                }
+                </div>
+            </main>
         </body>
     </html>
 }

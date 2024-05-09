@@ -9,6 +9,7 @@ import (
 	"github.com/marcelhfm/home_server/internal/db"
 	"github.com/marcelhfm/home_server/internal/http"
 	"github.com/marcelhfm/home_server/internal/tcp"
+	"github.com/marcelhfm/home_server/pkg/types"
 )
 
 func main() {
@@ -20,9 +21,9 @@ func main() {
 	db := db.Init_pq()
 	defer db.Close()
 
-	commandChannel := make(chan http.CommandRequest)
-	commandResponseChannel := make(chan http.CommandResponse)
+	commandChannel := make(chan types.CommandRequest)
+	commandResponseChannel := make(chan types.CommandResponse)
 
 	go tcp.StartTCPServer(db, commandChannel, commandResponseChannel)
-	http.StartHttpServer(commandChannel, commandResponseChannel)
+	http.StartHttpServer(db, commandChannel, commandResponseChannel)
 }
