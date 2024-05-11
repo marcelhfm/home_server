@@ -8,8 +8,7 @@ RUN go mod download
 
 COPY . . 
 
-RUN CG=_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o tcp_server .
-
+RUN CG0_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o tcp_server .
 
 FROM alpine:latest
 
