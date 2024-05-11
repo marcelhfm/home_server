@@ -1,6 +1,10 @@
 package types
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type CommandBody struct {
 	Command string
@@ -22,4 +26,9 @@ type CommandResponse struct {
 type Datasource struct {
 	Id   int
 	Name string
+}
+
+type DatasourceLastSeen struct {
+	Datasource Datasource
+	Last_seen  *time.Time
 }

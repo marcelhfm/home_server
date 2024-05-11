@@ -4,10 +4,9 @@ import (
   "github.com/marcelhfm/home_server/views/components/header"
   "github.com/marcelhfm/home_server/views/components/datasource-card"
   "github.com/marcelhfm/home_server/pkg/types"
-	"strconv"
 )
 
-templ Index(datasources []types.Datasource) {
+templ Index(datasourcesLastSeen []types.DatasourceLastSeen) {
  <!DOCTYPE html>
     <html lang="en">
         @header.Header()
@@ -18,10 +17,16 @@ templ Index(datasources []types.Datasource) {
                       Pihome
                     </h3>
                 </nav>
+
                 <div class="p-4">
-                for _, datasource := range datasources {
-                  @datasource_card.DatasourceCard(datasource.Name, strconv.Itoa(datasource.Id))
-                }
+                  <p class="text-lg font-medium mb-2">Datasources</p>
+                  <div class="flex w-full">
+                  for _, datasource := range datasourcesLastSeen {
+                    <div class="mr-2 w-full max-w-sm">
+                      @datasource_card.DatasourceCard(datasource.Datasource.Name, datasource.Last_seen)
+                    </div>
+                  }
+                  </div>
                 </div>
             </main>
         </body>
