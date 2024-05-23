@@ -16,11 +16,14 @@ var commandMap = map[string]int{
 	"command_co2_display_on":  2,
 }
 
+var errorAlert string = `<div id="alert" class="transitio-opacity ease-in duration-150 max-w-md ml-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">%s</div>`
+var successAlert string = `<div id="alert" class="transition-opacity ease-in duration-150 max-w-md ml-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">%s</div>`
+
 func SendCommandHandler(commandChannel chan<- types.CommandRequest, commandResponseChannel <-chan types.CommandResponse) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			fmt.Println("http: Received request with wrong method")
-			http.Error(w, "Method is not supported", http.StatusNotFound)
+			w.Write([]byte(fmt.Sprintf(errorAlert, "Something went wrong :( (Wront http method)")))
 			return
 		}
 
@@ -28,7 +31,7 @@ func SendCommandHandler(commandChannel chan<- types.CommandRequest, commandRespo
 
 		datasourceId, err := strconv.Atoi(id)
 		if err != nil {
-			http.Error(w, "ID is not int", http.StatusBadRequest)
+			w.Write([]byte(fmt.Sprintf(errorAlert, "Something went wrong :( (Invalid id)")))
 			return
 		}
 
@@ -36,7 +39,8 @@ func SendCommandHandler(commandChannel chan<- types.CommandRequest, commandRespo
 
 		commandCode, ok := commandMap[cmd]
 		if !ok {
-			http.Error(w, "Invaild command", http.StatusBadRequest)
+			w.Write([]byte(fmt.Sprintf(errorAlert, "Something went wrong :( (Invalid command)")))
+			return
 		}
 
 		rq := types.CommandRequest{
@@ -51,9 +55,9 @@ func SendCommandHandler(commandChannel chan<- types.CommandRequest, commandRespo
 		response := <-commandResponseChannel
 
 		if response.Error != nil {
-			http.Error(w, response.Error.Error(), http.StatusInternalServerError)
+			w.Write([]byte(fmt.Sprintf(errorAlert, fmt.Sprintf("Internal server error (%v)", response.Error))))
 		} else {
-			fmt.Fprintf(w, "Command %s sent to datasource %d successfully.", cmd, datasourceId)
+			w.Write([]byte(fmt.Sprintf(errorAlert, "Command sent successfully!")))
 		}
 	}
 }

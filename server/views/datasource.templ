@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-templ Datasource(id string) {
+templ Datasource(id string, name string) {
  <!DOCTYPE html>
     <html lang="en">
         @header.Header()
@@ -15,18 +15,38 @@ templ Datasource(id string) {
                 @topbar.Topbar()
 
                 <div class="p-4">
-                  <div class="flex w-full">
-                    <p class="text-lg font-medium mb-2">Datasource {id}</p>
+                  <div class="flex w-full items-center">
+                    <div class="flex items-center">
+                      <a href="/">
+                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 19-7-7 7-7"/>
+                        </svg>
+                      </a>
+
+                      <p class="text-lg font-medium">{name}</p>
+                    </div>
                     <div class="flex ml-auto">
-                      <div hx-post={ string(templ.URL(fmt.Sprintf("/api/ds/%s/cmd/command_co2_display_on", id))) } class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Turn On</div>
-                      <div hx-post={ string(templ.URL(fmt.Sprintf("/api/ds/%s/cmd/command_co2_display_off", id))) } class="ml-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Turn Off</div>
+                      <div hx-target="#alert" hx-swap="outerHTML" hx-post={ string(templ.URL(fmt.Sprintf("/api/ds/%s/cmd/command_co2_display_on", id))) } class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Turn On</div>
+                      <div hx-target="#alert" hx-swap="outerHTML" hx-post={ string(templ.URL(fmt.Sprintf("/api/ds/%s/cmd/command_co2_display_off", id))) } class="ml-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Turn Off</div>
                     </div>
                   </div>
                   <div class="flex w-full">
                     Test
                  </div>
                 </div>
+                <div id="alert" class="mt-4"></div>
             </main>
+            <script type="text/javascript">
+              document.body.addEventListener("htmx:afterSwap", function(event) {
+                if (event.detail.target.id === "alert") {
+                  setTimeout(function() {
+                    const alert = document.getElementById("alert");
+                    alert.removeAttribute("class")
+                    alert.innerHTML = ""
+                  }, 2000)
+                }
+              })
+            </script>
         </body>
     </html>
 }

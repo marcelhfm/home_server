@@ -5,9 +5,9 @@ import (
   "fmt"
 )
 
-templ DatasourceCard(title string, id string, last_seen *time.Time) {
-  <a href={ templ.URL(fmt.Sprintf("/ds/%s", id)) } class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{title}</h5>
+templ DatasourceCard(name string, id string, last_seen *time.Time) {
+  <a href={ templ.URL(fmt.Sprintf("/ds/%s?name=%s", id, name)) } class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{name}</h5>
     if last_seen != nil {
       <p class="font-normal text-gray-700 dark:text-gray-400">Last seen: {last_seen.Format("15:04:05")}</p>
     } else {
