@@ -1,17 +1,20 @@
 package http
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/google/uuid"
 
 	"github.com/marcelhfm/home_server/pkg/types"
 )
+
+var commandMap = map[string]int{
+	"command_co2_display_off": 1,
+	"command_co2_display_on":  2,
+}
 
 func SendCommandHandler(commandChannel chan<- types.CommandRequest, commandResponseChannel <-chan types.CommandResponse) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -21,11 +24,7 @@ func SendCommandHandler(commandChannel chan<- types.CommandRequest, commandRespo
 			return
 		}
 
-		id := strings.TrimPrefix(r.URL.Path, "/api/datasource/command/")
-		if id == "" {
-			http.Error(w, "ID is required", http.StatusBadRequest)
-			return
-		}
+		id := r.PathValue("id")
 
 		datasourceId, err := strconv.Atoi(id)
 		if err != nil {
@@ -33,14 +32,9 @@ func SendCommandHandler(commandChannel chan<- types.CommandRequest, commandRespo
 			return
 		}
 
-		var c types.CommandBody
+		cmd := r.PathValue("cmd")
 
-		err = json.NewDecoder(r.Body).Decode(&c)
-		if err != nil {
-			http.Error(w, "Body is in wrong format", http.StatusBadRequest)
-		}
-
-		commandCode, ok := commandMap[c.Command]
+		commandCode, ok := commandMap[cmd]
 		if !ok {
 			http.Error(w, "Invaild command", http.StatusBadRequest)
 		}
@@ -59,7 +53,7 @@ func SendCommandHandler(commandChannel chan<- types.CommandRequest, commandRespo
 		if response.Error != nil {
 			http.Error(w, response.Error.Error(), http.StatusInternalServerError)
 		} else {
-			fmt.Fprintf(w, "Command %s sent to datasource %d successfully.", c.Command, datasourceId)
+			fmt.Fprintf(w, "Command %s sent to datasource %d successfully.", cmd, datasourceId)
 		}
 	}
 }

@@ -1,0 +1,32 @@
+package views
+
+import (
+  "github.com/marcelhfm/home_server/views/components/header"
+  "github.com/marcelhfm/home_server/views/components/topbar"
+	"fmt"
+)
+
+templ Datasource(id string) {
+ <!DOCTYPE html>
+    <html lang="en">
+        @header.Header()
+        <body>
+            <main class="min-h-screen w-full">
+                @topbar.Topbar()
+
+                <div class="p-4">
+                  <div class="flex w-full">
+                    <p class="text-lg font-medium mb-2">Datasource {id}</p>
+                    <div class="flex ml-auto">
+                      <div hx-post={ string(templ.URL(fmt.Sprintf("/api/ds/%s/cmd/command_co2_display_on", id))) } class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Turn On</div>
+                      <div hx-post={ string(templ.URL(fmt.Sprintf("/api/ds/%s/cmd/command_co2_display_off", id))) } class="ml-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Turn Off</div>
+                    </div>
+                  </div>
+                  <div class="flex w-full">
+                    Test
+                 </div>
+                </div>
+            </main>
+        </body>
+    </html>
+}

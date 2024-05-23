@@ -11,9 +11,11 @@ import "io"
 import "bytes"
 
 import (
+	"fmt"
 	"github.com/marcelhfm/home_server/pkg/types"
 	"github.com/marcelhfm/home_server/views/components/datasource-card"
 	"github.com/marcelhfm/home_server/views/components/header"
+	"github.com/marcelhfm/home_server/views/components/topbar"
 )
 
 func Index(datasourcesLastSeen []types.DatasourceLastSeen) templ.Component {
@@ -37,7 +39,15 @@ func Index(datasourcesLastSeen []types.DatasourceLastSeen) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<body><main class=\"min-h-screen w-full\"><nav class=\"flex w-full border border-b-zinc-200 px-4 py-4\"><h3 class=\"text-base lg:text-lg font-medium text-center\">Pihome</h3></nav><div class=\"p-4\"><p class=\"text-lg font-medium mb-2\">Datasources</p><div class=\"flex w-full\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<body><main class=\"min-h-screen w-full\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = topbar.Topbar().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"p-4\"><p class=\"text-lg font-medium mb-2\">Datasources</p><div class=\"flex w-full\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -46,7 +56,7 @@ func Index(datasourcesLastSeen []types.DatasourceLastSeen) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = datasource_card.DatasourceCard(datasource.Datasource.Name, datasource.Last_seen).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = datasource_card.DatasourceCard(datasource.Datasource.Name, fmt.Sprint(datasource.Datasource.Id), datasource.Last_seen).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
