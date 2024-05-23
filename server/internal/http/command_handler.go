@@ -57,7 +57,7 @@ func SendCommandHandler(commandChannel chan<- types.CommandRequest, commandRespo
 		if response.Error != nil {
 			w.Write([]byte(fmt.Sprintf(errorAlert, fmt.Sprintf("Internal server error (%v)", response.Error))))
 		} else {
-			w.Write([]byte(fmt.Sprintf(errorAlert, "Command sent successfully!")))
+			w.Write([]byte(fmt.Sprintf(successAlert, "Command sent successfully!")))
 		}
 	}
 }
