@@ -5,11 +5,10 @@
 }
 
 :8085 {
-  reverse_proxy /api/* server:8080
-  reverse_proxy / server:8080
-
   reverse_proxy /grafana grafana:3000 
   reverse_proxy /grafana/* grafana:3000
 
   reverse_proxy /db timescaledb:5432
+
+  reverse_proxy / server:8080
 }

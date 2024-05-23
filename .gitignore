@@ -1,4 +1,4 @@
 .env
 server/bin
-server/tmp/**.*
+server/tmp
 deploy.sh
