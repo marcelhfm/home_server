@@ -15,7 +15,7 @@ import (
 )
 
 // TODO: Store this information in the db
-var picow_value_descr = [...]string{"datasourceId", "co2", "temperature", "humidity"}
+var picow_value_descr = [...]string{"datasourceId", "co2", "temperature", "humidity", "display_status"}
 
 var connections = make(map[int]net.Conn)
 var mut sync.Mutex
@@ -120,12 +120,6 @@ func handleConnection(conn net.Conn, pg_db *sql.DB) {
 		}
 		fmt.Println("tcp: Successfully inserted message")
 	}
-
-	mut.Lock()
-	delete(connections, datasourceId)
-	mut.Unlock()
-	conn.Close()
-	fmt.Printf("tcp: Closed and removed connection for datasource %d\n", datasourceId)
 }
 
 func parseCsv(message string) []int {
