@@ -90,15 +90,23 @@ func IndexHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		datasources, err := getDatasources(db)
 		if err != nil {
-			fmt.Println("Error fetching datasources", err)
+			fmt.Println("IndexHandler: Error fetching datasources", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 
 		datasourcesLastSeen, err := getLastSeen(db, datasources)
 
 		if err != nil {
-			fmt.Println("Error getting last seen", err)
+			fmt.Println("IndexHandler: Error getting last seen", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 
-		views.Index(datasourcesLastSeen).Render(r.Context(), w)
+		err = views.Index(datasourcesLastSeen).Render(r.Context(), w)
+
+		if err != nil {
+			fmt.Println("IndexHandler: Error rendering: ", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }

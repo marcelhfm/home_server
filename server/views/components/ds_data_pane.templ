@@ -1,0 +1,11 @@
+package components
+
+templ DatasourceDataPane(chart string) {
+
+  <div id="data-pane">
+    Data pane my friend
+    <div>
+       @templ.Raw(chart)
+    </div>
+  </div>
+}

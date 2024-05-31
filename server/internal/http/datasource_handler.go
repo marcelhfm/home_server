@@ -1,13 +1,25 @@
 package http
 
 import (
+	"database/sql"
 	"net/http"
 
 	"github.com/marcelhfm/home_server/views"
 )
 
-func DatasourceHandler() http.HandlerFunc {
+type TimeseriesResponse struct {
+	Id            string
+	Datasource_id int
+	Metric        string
+	Value         int
+	Timestamp     string
+}
+
+func DatasourceHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		views.Datasource(r.PathValue("id"), r.URL.Query().Get("name")).Render(r.Context(), w)
+		dsId := r.PathValue("id")
+		dsName := r.URL.Query().Get("name")
+
+		views.Datasource(dsId, dsName).Render(r.Context(), w)
 	}
 }

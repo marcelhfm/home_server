@@ -22,8 +22,10 @@ func StartHttpServer(db *sql.DB, commandChannel chan<- types.CommandRequest, com
 	router := http.NewServeMux()
 
 	router.HandleFunc("GET /", IndexHandler(db))
-	router.HandleFunc("GET /ds/{id}", DatasourceHandler())
+	router.HandleFunc("GET /ds/{id}", DatasourceHandler(db))
 	router.HandleFunc("POST /api/ds/{id}/cmd/{cmd}", SendCommandHandler(commandChannel, commandResponseChannel))
+	router.HandleFunc("GET /api/ds/{id}/display_button", DisplayButtonHandler(db))
+	router.HandleFunc("GET /api/ds/{id}/data_pane", DataPaneHandler(db))
 	fmt.Println("Http Server listening on port 8080")
 
 	loggedRouter := LoggerMiddleware(router)
