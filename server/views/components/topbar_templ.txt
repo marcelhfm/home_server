@@ -1,1 +1,0 @@
-<nav class=\"flex w-full border border-b-zinc-200 px-4 py-4\"><a href=\"/\"><h3 class=\"text-base lg:text-lg font-medium text-center\">Pihome</h3></a></nav>
