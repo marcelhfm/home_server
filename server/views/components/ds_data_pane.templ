@@ -1,11 +1,33 @@
 package components
 
-templ DatasourceDataPane(chart string) {
+import "strconv"
 
-  <div id="data-pane">
-    Data pane my friend
-    <div>
-       @templ.Raw(chart)
+templ DatasourceDataPane(chart string, co2 int, display_status int) {
+
+  <div id="data-pane" class="mt-8">
+    <div class="w-full">
+      <div class="flex max-w-2xl ml-auto mr-auto">
+        <div class="block w-full p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 mr-10">
+          if co2 > 1200 {
+            <p class="text-lg text-red-500">{strconv.Itoa(co2)}</p>
+          } else {
+            <p class="text-lg text-green-500">{strconv.Itoa(co2)}</p>
+          }
+          <p class="font-normal text-gray-700 dark:text-gray-400">Current CO2 (ppm)</p>
+        </div>
+        <div class="block w-full p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+          <p class="font-normal text-gray-700 dark:text-gray-400">
+          if display_status == 1 {
+            Display: <p class="text-green-500 text-lg">On</p>
+          } else {
+            Display: <p class="text-red-500 text-lg">Off</p>
+          }
+          </p>
+        </div>
+      </div>
+      <div class="flex ml-auto mr-auto block max-w-2xl p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 mt-5">
+         @templ.Raw(chart)
+      </div>
     </div>
   </div>
 }

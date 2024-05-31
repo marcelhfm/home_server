@@ -23,7 +23,7 @@ func Topbar() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav class=\"flex w-full border border-b-zinc-200 px-4 py-4\"><a href=\"/\"><h3 class=\"text-base lg:text-lg font-medium text-center\">Pihome</h3></a></nav>")
+		templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 1)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

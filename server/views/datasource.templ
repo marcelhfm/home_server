@@ -13,7 +13,7 @@ templ Datasource(id string, name string) {
             <main class="min-h-screen w-full">
                 @components.Topbar()
                 <div class="p-4">
-                  <div class="flex w-full items-center">
+                  <div class="flex w-full max-w-2xl items-center ml-auto mr-auto">
                     <div class="flex items-center">
                       <a href="/">
                         <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -28,7 +28,7 @@ templ Datasource(id string, name string) {
                     </div>
                   </div>
 
-                  <div id="data-pane" hx-get={ string(templ.URL(fmt.Sprintf("/api/ds/%s/data_pane", id))) } hx-trigger="load, every 5s">
+                  <div id="data-pane" hx-get={ string(templ.URL(fmt.Sprintf("/api/ds/%s/data_pane", id))) } hx-trigger="load">
                     Loading...
                  </div>
 

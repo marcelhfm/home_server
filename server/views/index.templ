@@ -14,14 +14,16 @@ templ Index(datasourcesLastSeen []types.DatasourceLastSeen) {
             <main class="min-h-screen w-full">
                 @components.Topbar()
 
-                <div class="p-4">
-                  <p class="text-lg font-medium mb-2">Datasources</p>
-                  <div class="flex w-full">
-                  for _, datasource := range datasourcesLastSeen {
-                    <div class="mr-2 w-full max-w-sm">
-                      @components.DatasourceCard(datasource.Datasource.Name, fmt.Sprint(datasource.Datasource.Id), datasource.Last_seen)
+                <div class="max-w-2xl flex ml-auto mr-auto mt-8">
+                  <div class="w-full">
+                    <p class="text-lg font-medium mb-2 ml-auto mr-auto">Datasources</p>
+                    <div class="flex w-full">
+                    for _, datasource := range datasourcesLastSeen {
+                      <div class="mr-2 w-full max-w-sm">
+                        @components.DatasourceCard(datasource.Datasource.Name, fmt.Sprint(datasource.Datasource.Id), datasource.Last_seen)
+                      </div>
+                    }
                     </div>
-                  }
                   </div>
                 </div>
             </main>
