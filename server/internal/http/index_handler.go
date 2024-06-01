@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	_ "time/tzdata"
 
 	"github.com/marcelhfm/home_server/pkg/types"
 	"github.com/marcelhfm/home_server/views"
