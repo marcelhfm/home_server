@@ -56,7 +56,7 @@ func Init_pq() *sql.DB {
 
 func IngestIotData(db *sql.DB, datasourceId int, metric string, value int, ts string) {
 
-	sqlStatement := `INSERT INTO timeseries (datasource_id, metric, value, timestamp) VALUES ($1, $2, $3, $4`
+	sqlStatement := `INSERT INTO timeseries (datasource_id, metric, value, timestamp) VALUES ($1, $2, $3, $4)`
 
 	_, err := db.Exec(sqlStatement, datasourceId, metric, value)
 
