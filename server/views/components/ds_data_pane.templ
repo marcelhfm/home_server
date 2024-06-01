@@ -2,7 +2,7 @@ package components
 
 import "strconv"
 
-templ DatasourceDataPane(chart string, co2 int, display_status int) {
+templ DatasourceDataPane(chart string, co2 int, display_status int, last_seen string) {
 
   <div id="data-pane" class="mt-8">
     <div class="w-full">
@@ -15,13 +15,18 @@ templ DatasourceDataPane(chart string, co2 int, display_status int) {
           }
           <p class="font-normal text-gray-700 dark:text-gray-400">Current CO2 (ppm)</p>
         </div>
-        <div class="block w-full p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+        <div class="block w-full p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 mr-10">
           <p class="font-normal text-gray-700 dark:text-gray-400">
           if display_status == 1 {
             Display: <p class="text-green-500 text-lg">On</p>
           } else {
             Display: <p class="text-red-500 text-lg">Off</p>
           }
+          </p>
+        </div>
+        <div class="block w-full p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+          <p class="font-normal text-gray-700 dark:text-gray-400">
+          Last seen: <p class="text-lg">{ last_seen }</p>
           </p>
         </div>
       </div>

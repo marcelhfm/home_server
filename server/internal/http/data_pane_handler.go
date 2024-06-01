@@ -13,7 +13,7 @@ import (
 	"github.com/marcelhfm/home_server/views/components"
 )
 
-func generateChart(data []TimeseriesData) (string, int, int, error) {
+func generateChart(data []TimeseriesData) (string, int, int, string, error) {
 	lineChart := charts.NewLine()
 
 	var co2 []opts.LineData
@@ -28,12 +28,19 @@ func generateChart(data []TimeseriesData) (string, int, int, error) {
 		el := data[i]
 		if !seen[el.Timestamp] {
 			seen[el.Timestamp] = true
-			time, err := time.Parse(time.RFC3339, el.Timestamp)
+
+			loc, err := time.LoadLocation("Europe/Berlin")
 			if err != nil {
-				return "", 0, 0, err
+				return "", 0, 0, "", err
 			}
 
-			formattedTime := time.Format("15:04")
+			t, err := time.Parse(time.RFC3339, el.Timestamp)
+			if err != nil {
+				return "", 0, 0, "", err
+			}
+
+			localTime := t.In(loc)
+			formattedTime := localTime.Format("15:04")
 
 			timestamps = append(timestamps, formattedTime)
 		}
@@ -71,9 +78,6 @@ func generateChart(data []TimeseriesData) (string, int, int, error) {
 		}
 	}
 
-	fmt.Println("tsl", len(timestamps))
-	fmt.Println("co2", len(co2))
-
 	lineChart.SetXAxis(timestamps).
 		AddSeries("Co2", co2).
 		AddSeries("Temperature", temp).
@@ -84,10 +88,10 @@ func generateChart(data []TimeseriesData) (string, int, int, error) {
 	err := lineChart.Render(&buf)
 
 	if err != nil {
-		return "", 0, 0, err
+		return "", 0, 0, "", err
 	}
 
-	return buf.String(), lastCo2, display_status, nil
+	return buf.String(), lastCo2, display_status, timestamps[len(timestamps)-1], nil
 }
 
 type TimeseriesData struct {
@@ -133,13 +137,13 @@ func DataPaneHandler(db *sql.DB) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 
-		chart, lastCo2, display_status, err := generateChart(data)
+		chart, lastCo2, display_status, last_seen, err := generateChart(data)
 		if err != nil {
 			fmt.Println("DataPaneHandler: ", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 
-		err = components.DatasourceDataPane(chart, lastCo2, display_status).Render(r.Context(), w)
+		err = components.DatasourceDataPane(chart, lastCo2, display_status, last_seen).Render(r.Context(), w)
 
 		if err != nil {
 			fmt.Println("DataPaneHandler: ", err)
