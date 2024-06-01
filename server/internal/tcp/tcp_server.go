@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/marcelhfm/home_server/internal/db"
 	"github.com/marcelhfm/home_server/pkg/types"
@@ -112,10 +113,12 @@ func handleConnection(conn net.Conn, pg_db *sql.DB) {
 			isFirstMessage = false
 		}
 
+		currTimestamp := time.Now().Format(time.RFC3339)
+
 		for i := 1; i < len(values); i++ {
 			value := values[i]
 
-			db.IngestIotData(pg_db, datasourceId, picow_value_descr[i], value)
+			db.IngestIotData(pg_db, datasourceId, picow_value_descr[i], value, currTimestamp)
 
 		}
 		fmt.Println("tcp: Successfully inserted message")

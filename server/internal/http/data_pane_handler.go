@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
@@ -27,7 +28,14 @@ func generateChart(data []TimeseriesData) (string, int, int, error) {
 		el := data[i]
 		if !seen[el.Timestamp] {
 			seen[el.Timestamp] = true
-			timestamps = append(timestamps, el.Timestamp)
+			time, err := time.Parse(time.RFC3339, el.Timestamp)
+			if err != nil {
+				return "", 0, 0, err
+			}
+
+			formattedTime := time.Format("15:04")
+
+			timestamps = append(timestamps, formattedTime)
 		}
 
 		switch el.Metric {
@@ -63,6 +71,9 @@ func generateChart(data []TimeseriesData) (string, int, int, error) {
 		}
 	}
 
+	fmt.Println("tsl", len(timestamps))
+	fmt.Println("co2", len(co2))
+
 	lineChart.SetXAxis(timestamps).
 		AddSeries("Co2", co2).
 		AddSeries("Temperature", temp).
@@ -88,7 +99,7 @@ type TimeseriesData struct {
 func getTimeseriesData(db *sql.DB, dsId string) ([]TimeseriesData, error) {
 	fmt.Println("DataPaneHandler: Fetching timeseries data for ds", dsId)
 
-	timeseriesQuery := fmt.Sprintf("SELECT metric, value, timestamp FROM timeseries WHERE datasource_id = %s ORDER BY timestamp desc LIMIT 1000", dsId)
+	timeseriesQuery := fmt.Sprintf("SELECT metric, value, timestamp FROM timeseries WHERE datasource_id = %s AND timestamp >=NOW() - INTERVAL '30 minutes' ORDER BY timestamp desc", dsId)
 
 	rows, err := db.Query(timeseriesQuery)
 	if err != nil {

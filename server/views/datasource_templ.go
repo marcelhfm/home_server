@@ -83,7 +83,7 @@ func Datasource(id string, name string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-trigger=\"load\">Loading...</div></div><div id=\"alert\" class=\"mt-4\"></div></main><script type=\"text/javascript\">\n              document.body.addEventListener(\"htmx:afterSwap\", function(event) {\n                if (event.detail.target.id === \"alert\") {\n                  setTimeout(function() {\n                    const alert = document.getElementById(\"alert\");\n                    alert.removeAttribute(\"class\")\n                    alert.innerHTML = \"\"\n                  }, 2000)\n                }\n              })\n            </script></body></html>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-trigger=\"load, every 10s\">Loading...</div></div><div id=\"alert\" class=\"mt-4\"></div></main><script type=\"text/javascript\">\n              document.body.addEventListener(\"htmx:afterSwap\", function(event) {\n                if (event.detail.target.id === \"alert\") {\n                  setTimeout(function() {\n                    const alert = document.getElementById(\"alert\");\n                    alert.removeAttribute(\"class\")\n                    alert.innerHTML = \"\"\n                  }, 2000)\n                }\n              })\n            </script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
