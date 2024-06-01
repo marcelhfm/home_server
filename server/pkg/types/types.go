@@ -1,8 +1,6 @@
 package types
 
 import (
-	"time"
-
 	"github.com/google/uuid"
 )
 
@@ -30,5 +28,5 @@ type Datasource struct {
 
 type DatasourceLastSeen struct {
 	Datasource Datasource
-	Last_seen  *time.Time
+	Last_seen  string
 }

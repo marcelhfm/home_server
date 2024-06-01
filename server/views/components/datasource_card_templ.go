@@ -12,10 +12,9 @@ import "bytes"
 
 import (
 	"fmt"
-	"time"
 )
 
-func DatasourceCard(name string, id string, last_seen *time.Time) templ.Component {
+func DatasourceCard(name string, id string, last_seen string) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -44,7 +43,7 @@ func DatasourceCard(name string, id string, last_seen *time.Time) templ.Componen
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/datasource_card.templ`, Line: 10, Col: 90}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/datasource_card.templ`, Line: 9, Col: 90}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -54,15 +53,15 @@ func DatasourceCard(name string, id string, last_seen *time.Time) templ.Componen
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if last_seen != nil {
+		if last_seen != "" {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"font-normal text-gray-700 dark:text-gray-400\">Last seen: ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
-			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(last_seen.Format("15:04:05"))
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(last_seen)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/datasource_card.templ`, Line: 12, Col: 102}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/datasource_card.templ`, Line: 11, Col: 84}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {

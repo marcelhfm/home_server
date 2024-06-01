@@ -73,13 +73,21 @@ func getLastSeen(db *sql.DB, datasources []types.Datasource) ([]types.Datasource
 		return nil, err
 	}
 
+	loc, err := time.LoadLocation("Europe/Berlin")
+	if err != nil {
+		return nil, err
+	}
+
 	for _, ds := range datasources {
 		last_seen, found := foundDatasources[ds.Id]
 
+		localTime := last_seen.In(loc)
+		formattedTime := localTime.Format("15:04")
+
 		if !found {
-			results = append(results, types.DatasourceLastSeen{Datasource: ds, Last_seen: nil})
+			results = append(results, types.DatasourceLastSeen{Datasource: ds, Last_seen: ""})
 		} else {
-			results = append(results, types.DatasourceLastSeen{Datasource: ds, Last_seen: &last_seen})
+			results = append(results, types.DatasourceLastSeen{Datasource: ds, Last_seen: formattedTime})
 		}
 	}
 
