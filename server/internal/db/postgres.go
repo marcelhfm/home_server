@@ -58,7 +58,7 @@ func IngestIotData(db *sql.DB, datasourceId int, metric string, value int, ts st
 
 	sqlStatement := `INSERT INTO timeseries (datasource_id, metric, value, timestamp) VALUES ($1, $2, $3, $4)`
 
-	_, err := db.Exec(sqlStatement, datasourceId, metric, value)
+	_, err := db.Exec(sqlStatement, datasourceId, metric, value, ts)
 
 	if err != nil {
 		fmt.Printf("db: An error occured while trying to insert into database: %s", err)
