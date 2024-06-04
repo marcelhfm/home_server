@@ -24,7 +24,7 @@
     {
       "datasource": {
         "type": "grafana-postgresql-datasource",
-        "uid": "edkht97xchzwgc"
+        "uid": "edle2riahy6tcf"
       },
       "fieldConfig": {
         "defaults": {
@@ -97,7 +97,7 @@
         {
           "datasource": {
             "type": "grafana-postgresql-datasource",
-            "uid": "edkht97xchzwgc"
+            "uid": "edle2riahy6tcf"
           },
           "editorMode": "builder",
           "format": "table",
@@ -179,7 +179,7 @@
     {
       "datasource": {
         "type": "grafana-postgresql-datasource",
-        "uid": "edkht97xchzwgc"
+        "uid": "edle2riahy6tcf"
       },
       "fieldConfig": {
         "defaults": {
@@ -262,7 +262,7 @@
         {
           "datasource": {
             "type": "grafana-postgresql-datasource",
-            "uid": "edkht97xchzwgc"
+            "uid": "edle2riahy6tcf"
           },
           "editorMode": "builder",
           "format": "table",
@@ -344,7 +344,15 @@
       "transformations": [
         {
           "id": "convertFieldType",
-          "options": {}
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "number",
+                "targetField": "value"
+              }
+            ],
+            "fields": {}
+          }
         }
       ],
       "type": "timeseries"
@@ -352,7 +360,7 @@
     {
       "datasource": {
         "type": "grafana-postgresql-datasource",
-        "uid": "edkht97xchzwgc"
+        "uid": "edle2riahy6tcf"
       },
       "fieldConfig": {
         "defaults": {
@@ -454,7 +462,7 @@
         {
           "datasource": {
             "type": "grafana-postgresql-datasource",
-            "uid": "edkht97xchzwgc"
+            "uid": "edle2riahy6tcf"
           },
           "editorMode": "builder",
           "format": "table",
@@ -552,7 +560,7 @@
     {
       "datasource": {
         "type": "grafana-postgresql-datasource",
-        "uid": "edkht97xchzwgc"
+        "uid": "edle2riahy6tcf"
       },
       "fieldConfig": {
         "defaults": {
@@ -635,7 +643,7 @@
         {
           "datasource": {
             "type": "grafana-postgresql-datasource",
-            "uid": "edkht97xchzwgc"
+            "uid": "edle2riahy6tcf"
           },
           "editorMode": "builder",
           "format": "table",
@@ -737,6 +745,6 @@
   "timezone": "browser",
   "title": "PicoW Co2",
   "uid": "adkhtnidh6134a",
-  "version": 11,
+  "version": 2,
   "weekStart": ""
 }

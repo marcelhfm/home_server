@@ -1,0 +1,32 @@
+package views
+
+import (
+  "github.com/marcelhfm/home_server/views/components"
+  "github.com/marcelhfm/home_server/pkg/types"
+  "fmt"
+)
+
+templ Index(datasourcesLastSeen []types.DatasourceLastSeen) {
+ <!DOCTYPE html>
+    <html lang="en">
+        @components.Header()
+        <body>
+            <main class="min-h-screen w-full">
+                @components.Topbar()
+
+                <div class="max-w-2xl flex ml-auto mr-auto mt-8">
+                  <div class="w-full">
+                    <p class="text-lg font-medium mb-2 ml-auto mr-auto">Datasources</p>
+                    <div class="flex w-full">
+                    for _, datasource := range datasourcesLastSeen {
+                      <div class="mr-2 w-full max-w-sm">
+                        @components.DatasourceCard(datasource.Datasource.Name, fmt.Sprint(datasource.Datasource.Id), datasource.Last_seen)
+                      </div>
+                    }
+                    </div>
+                  </div>
+                </div>
+            </main>
+        </body>
+    </html>
+}

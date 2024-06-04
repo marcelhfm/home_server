@@ -1,92 +1,33 @@
 package http
 
 import (
-	"encoding/json"
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
-	"strings"
+	"time"
 
-	"github.com/google/uuid"
+	"github.com/marcelhfm/home_server/pkg/types"
 )
 
-var commandMap = map[string]int{
-	"command_co2_display_off": 1,
-	"command_co2_display_on":  2,
+func LoggerMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		next.ServeHTTP(w, r)
+		log.Printf("%s %s %v", r.Method, r.URL.Path, time.Since(start))
+	})
 }
 
-type CommandBody struct {
-	Command string
-}
+func StartHttpServer(db *sql.DB, commandChannel chan<- types.CommandRequest, commandResponseChannel <-chan types.CommandResponse) {
+	router := http.NewServeMux()
 
-type CommandRequest struct {
-	Id           uuid.UUID
-	Command      int
-	DatasourceId int
-}
-
-type CommandResponse struct {
-	Id           uuid.UUID
-	Command      int
-	DatasourceId int
-	Error        error
-}
-
-func StartHttpServer(commandChannel chan<- CommandRequest, commandResponseChannel <-chan CommandResponse) {
-	http.HandleFunc("POST /api/datasource/command/", sendCommandHandler(commandChannel, commandResponseChannel))
+	router.HandleFunc("GET /", IndexHandler(db))
+	router.HandleFunc("GET /ds/{id}", DatasourceHandler(db))
+	router.HandleFunc("POST /api/ds/{id}/cmd/{cmd}", SendCommandHandler(commandChannel, commandResponseChannel))
+	router.HandleFunc("GET /api/ds/{id}/display_button", DisplayButtonHandler(db))
+	router.HandleFunc("GET /api/ds/{id}/data_pane", DataPaneHandler(db))
 	fmt.Println("Http Server listening on port 8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
-}
 
-func sendCommandHandler(commandChannel chan<- CommandRequest, commandResponseChannel <-chan CommandResponse) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "POST" {
-			fmt.Println("http: Received request with wrong method")
-			http.Error(w, "Method is not supported", http.StatusNotFound)
-			return
-		}
-
-		id := strings.TrimPrefix(r.URL.Path, "/api/datasource/command/")
-		if id == "" {
-			http.Error(w, "ID is required", http.StatusBadRequest)
-			return
-		}
-
-		datasourceId, err := strconv.Atoi(id)
-		if err != nil {
-			http.Error(w, "ID is not int", http.StatusBadRequest)
-			return
-		}
-
-		var c CommandBody
-
-		err = json.NewDecoder(r.Body).Decode(&c)
-		if err != nil {
-			http.Error(w, "Body is in wrong format", http.StatusBadRequest)
-		}
-
-		commandCode, ok := commandMap[c.Command]
-		if !ok {
-			http.Error(w, "Invaild command", http.StatusBadRequest)
-		}
-
-		rq := CommandRequest{
-			Id:           uuid.New(),
-			Command:      commandCode,
-			DatasourceId: datasourceId,
-		}
-
-		log.Printf("Send command %d to datasource with id: %d", rq.Command, rq.DatasourceId)
-		commandChannel <- rq
-
-		response := <-commandResponseChannel
-
-		if response.Error != nil {
-			http.Error(w, response.Error.Error(), http.StatusInternalServerError)
-		} else {
-			fmt.Fprintf(w, "Command %s sent to datasource %d successfully.", c.Command, datasourceId)
-		}
-
-	}
+	loggedRouter := LoggerMiddleware(router)
+	log.Fatal(http.ListenAndServe(":8080", loggedRouter))
 }

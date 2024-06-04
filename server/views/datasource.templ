@@ -1,0 +1,51 @@
+package views
+
+import (
+  "github.com/marcelhfm/home_server/views/components"
+	"fmt"
+)
+
+templ Datasource(id string, name string) {
+ <!DOCTYPE html>
+    <html lang="en">
+        @components.Header()
+        <body>
+            <main class="min-h-screen w-full">
+                @components.Topbar()
+                <div class="p-4">
+                  <div class="flex w-full max-w-2xl items-center ml-auto mr-auto">
+                    <div class="flex items-center">
+                      <a href="/">
+                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 19-7-7 7-7"/>
+                        </svg>
+                      </a>
+
+                      <p class="text-lg font-medium">{name}</p>
+                    </div>
+                    <div class="flex ml-auto">
+                      <div id="display-button" hx-get={ string(templ.URL(fmt.Sprintf("/api/ds/%s/display_button", id))) } hx-trigger="load, every 3s">Loading...</div>
+                    </div>
+                  </div>
+
+                  <div id="data-pane" hx-get={ string(templ.URL(fmt.Sprintf("/api/ds/%s/data_pane", id))) } hx-trigger="load, every 10s">
+                    Loading...
+                 </div>
+
+                </div>
+                <div id="alert" class="mt-4"></div>
+            </main>
+            <script type="text/javascript">
+              document.body.addEventListener("htmx:afterSwap", function(event) {
+                if (event.detail.target.id === "alert") {
+                  setTimeout(function() {
+                    const alert = document.getElementById("alert");
+                    alert.removeAttribute("class")
+                    alert.innerHTML = ""
+                  }, 2000)
+                }
+              })
+            </script>
+        </body>
+    </html>
+}

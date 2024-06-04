@@ -9,18 +9,19 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/marcelhfm/home_server/internal/db"
-	"github.com/marcelhfm/home_server/internal/http"
+	"github.com/marcelhfm/home_server/pkg/types"
 )
 
 // TODO: Store this information in the db
-var picow_value_descr = [...]string{"datasourceId", "co2", "temperature", "humidity"}
+var picow_value_descr = [...]string{"datasourceId", "co2", "temperature", "humidity", "display_status"}
 
 var connections = make(map[int]net.Conn)
 var mut sync.Mutex
 
-func StartTCPServer(db *sql.DB, commandChannel <-chan http.CommandRequest, commandResponseChannel chan<- http.CommandResponse) {
+func StartTCPServer(db *sql.DB, commandChannel <-chan types.CommandRequest, commandResponseChannel chan<- types.CommandResponse) {
 	ln, err := net.Listen("tcp", ":5001")
 	if err != nil {
 		fmt.Println("tcp: Error listening:", err.Error())
@@ -52,7 +53,7 @@ func StartTCPServer(db *sql.DB, commandChannel <-chan http.CommandRequest, comma
 		if ok {
 			fmt.Printf("tcp: Sending command: %d to datasource: %d\n", command.Command, command.DatasourceId)
 			err := sendCommand(conn, command.Command)
-			commandResponseChannel <- http.CommandResponse{
+			commandResponseChannel <- types.CommandResponse{
 				Id:           command.Id,
 				Command:      command.Command,
 				DatasourceId: command.DatasourceId,
@@ -60,7 +61,7 @@ func StartTCPServer(db *sql.DB, commandChannel <-chan http.CommandRequest, comma
 			}
 		} else {
 			fmt.Printf("tcp: No connection found for datasource: %d\n", command.DatasourceId)
-			commandResponseChannel <- http.CommandResponse{
+			commandResponseChannel <- types.CommandResponse{
 				Id:           command.Id,
 				Command:      command.Command,
 				DatasourceId: command.DatasourceId,
@@ -112,20 +113,16 @@ func handleConnection(conn net.Conn, pg_db *sql.DB) {
 			isFirstMessage = false
 		}
 
+		currTimestamp := time.Now().Format(time.RFC3339)
+
 		for i := 1; i < len(values); i++ {
 			value := values[i]
 
-			db.IngestIotData(pg_db, datasourceId, picow_value_descr[i], value)
+			db.IngestIotData(pg_db, datasourceId, picow_value_descr[i], value, currTimestamp)
 
 		}
 		fmt.Println("tcp: Successfully inserted message")
 	}
-
-	mut.Lock()
-	delete(connections, datasourceId)
-	mut.Unlock()
-	conn.Close()
-	fmt.Printf("tcp: Closed and removed connection for datasource %d\n", datasourceId)
 }
 
 func parseCsv(message string) []int {

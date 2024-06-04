@@ -1,3 +1,4 @@
 .env
 server/bin
+server/tmp
 deploy.sh
