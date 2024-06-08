@@ -86,7 +86,6 @@ func getLastSeen(db *sql.DB, datasources []types.Datasource) ([]types.Datasource
 		if found {
 			localTime := last_seen.In(loc)
 			formattedTime := localTime.Format("15:04")
-			fmt.Println(formattedTime)
 			datasources[i].Last_seen = formattedTime
 		}
 	}
@@ -104,7 +103,6 @@ func IndexHandler(db *sql.DB) http.HandlerFunc {
 		}
 
 		datasourcesLastSeen, err := getLastSeen(db, datasources)
-		fmt.Println(datasourcesLastSeen)
 
 		if err != nil {
 			fmt.Println("IndexHandler: Error getting last seen", err)
