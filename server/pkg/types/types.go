@@ -22,11 +22,8 @@ type CommandResponse struct {
 }
 
 type Datasource struct {
-	Id   int
-	Name string
-}
-
-type DatasourceLastSeen struct {
-	Datasource Datasource
-	Last_seen  string
+	Id        int
+	Name      string
+	Status    string
+	Last_seen string
 }
