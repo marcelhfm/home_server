@@ -15,7 +15,6 @@ import (
 	"github.com/marcelhfm/home_server/pkg/types"
 )
 
-// TODO: Store this information in the db
 var picow_value_descr = [...]string{"datasourceId", "co2", "temperature", "humidity", "display_status"}
 
 var connections = make(map[int]net.Conn)
@@ -72,14 +71,13 @@ func StartTCPServer(db *sql.DB, commandChannel <-chan types.CommandRequest, comm
 }
 
 func handleConnection(conn net.Conn, pg_db *sql.DB) {
-	isFirstMessage := true
-	var datasourceId int
+	var datasourceId int // Declare datasourceId at the start of the function
 
 	defer func() {
 		mut.Lock()
 		if current, ok := connections[datasourceId]; ok && current == conn {
 			delete(connections, datasourceId)
-			update_datasource_status(pg_db, datasourceId, "DISCONNECTED")
+			updateDatasourceStatus(pg_db, datasourceId, "DISCONNECTED")
 			fmt.Printf("tcp: Removed connection and updated status to DISCONNECTED for datasource %d\n", datasourceId)
 		}
 		mut.Unlock()
@@ -87,11 +85,19 @@ func handleConnection(conn net.Conn, pg_db *sql.DB) {
 	}()
 
 	reader := bufio.NewReader(conn)
+	isFirstMessage := true
+
 	for {
+		conn.SetReadDeadline(time.Now().Add(1 * time.Minute)) // Set a read deadline to detect timeouts
+
 		message, err := reader.ReadString('\n')
 
 		if err != nil {
-			fmt.Printf("tcp: Error on connection for datasource %d: %s\n", datasourceId, err.Error())
+			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
+				fmt.Printf("tcp: Timeout on connection for datasource %d: %s\n", datasourceId, err.Error())
+			} else {
+				fmt.Printf("tcp: Error on connection for datasource %d: %s\n", datasourceId, err.Error())
+			}
 			return
 		}
 
@@ -101,17 +107,17 @@ func handleConnection(conn net.Conn, pg_db *sql.DB) {
 		if isFirstMessage {
 			datasourceId = values[0]
 			mut.Lock()
-			exitingConn, exists := connections[datasourceId]
+			existingConn, exists := connections[datasourceId]
 			if exists {
 				fmt.Printf("tcp: Connection updated for datasource %d\n", datasourceId)
-				if exitingConn != conn {
-					exitingConn.Close()
+				if existingConn != conn {
+					existingConn.Close()
 				}
 			} else {
 				fmt.Printf("tcp: New Connection added for datasource %d\n", datasourceId)
 			}
 			connections[datasourceId] = conn
-			update_datasource_status(pg_db, datasourceId, "CONNECTED")
+			updateDatasourceStatus(pg_db, datasourceId, "CONNECTED")
 			mut.Unlock()
 			isFirstMessage = false
 		}
@@ -163,10 +169,9 @@ func sendCommand(conn net.Conn, command int) error {
 	return nil
 }
 
-func update_datasource_status(db *sql.DB, datasourceId int, status string) {
+func updateDatasourceStatus(db *sql.DB, datasourceId int, status string) {
 	query := `UPDATE datasources SET status = $1 WHERE id = $2`
 	_, err := db.Exec(query, status, datasourceId)
-
 	if err != nil {
 		fmt.Printf("tcp: Error updating status for datasource %d to %s: %s\n", datasourceId, status, err.Error())
 	}

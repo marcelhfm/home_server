@@ -6,7 +6,7 @@ import (
   "fmt"
 )
 
-templ Index(datasourcesLastSeen []types.DatasourceLastSeen) {
+templ Index(datasourcesLastSeen []types.Datasource) {
  <!DOCTYPE html>
     <html lang="en">
         @components.Header()
@@ -15,12 +15,12 @@ templ Index(datasourcesLastSeen []types.DatasourceLastSeen) {
                 @components.Topbar()
 
                 <div class="max-w-2xl flex ml-auto mr-auto mt-8">
-                  <div class="w-full">
+                  <div class="w-full ml-2">
                     <p class="text-lg font-medium mb-2 ml-auto mr-auto">Datasources</p>
                     <div class="flex w-full">
                     for _, datasource := range datasourcesLastSeen {
                       <div class="mr-2 w-full max-w-sm">
-                        @components.DatasourceCard(datasource.Datasource.Name, fmt.Sprint(datasource.Datasource.Id), datasource.Last_seen)
+                        @components.DatasourceCard(datasource.Name, fmt.Sprint(datasource.Id), datasource.Last_seen, datasource.Status)
                       </div>
                     }
                     </div>

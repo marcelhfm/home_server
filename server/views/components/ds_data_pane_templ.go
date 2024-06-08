@@ -12,7 +12,7 @@ import "bytes"
 
 import "strconv"
 
-func DatasourceDataPane(chart string, co2 int, display_status int, last_seen string) templ.Component {
+func DatasourceDataPane(chart string, co2 int, display_status int, last_seen string, status string) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -25,7 +25,7 @@ func DatasourceDataPane(chart string, co2 int, display_status int, last_seen str
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"data-pane\" class=\"mt-8\"><div class=\"w-full\"><div class=\"flex max-w-2xl ml-auto mr-auto\"><div class=\"block w-full p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 mr-10\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"data-pane\" class=\"mt-8\"><div class=\"w-full\"><div class=\"flex max-w-2xl ml-auto mr-auto\"><div class=\"block w-full p-6 bg-white border border-gray-200 rounded-lg shadow mr-2 sm:mr-10\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -66,7 +66,7 @@ func DatasourceDataPane(chart string, co2 int, display_status int, last_seen str
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"font-normal text-gray-700 dark:text-gray-400\">Current CO2 (ppm)</p></div><div class=\"block w-full p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 mr-10\"><p class=\"font-normal text-gray-700 dark:text-gray-400\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"font-normal text-gray-700 dark:text-gray-400\">Current CO2 (ppm)</p></div><div class=\"block w-full p-6 bg-white border border-gray-200 rounded-lg shadow mr-2 sm:mr-10\"><p class=\"font-normal text-gray-700 dark:text-gray-400\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -81,20 +81,50 @@ func DatasourceDataPane(chart string, co2 int, display_status int, last_seen str
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p></div><div class=\"block w-full p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700\"><p class=\"font-normal text-gray-700 dark:text-gray-400\">Last seen: <p class=\"text-lg\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p></div><div class=\"block w-full p-6 bg-white border border-gray-200 rounded-lg shadow\"><p class=\"font-normal text-gray-700 mr-2\">Last seen:</p><div class=\"flex items-center\"><p class=\"text-lg\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(last_seen)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/ds_data_pane.templ`, Line: 29, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/ds_data_pane.templ`, Line: 31, Col: 42}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p></p></div></div><div class=\"flex ml-auto mr-auto block max-w-2xl p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 mt-5\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p><span class=\"relative flex h-3 w-3 ml-2\"><span")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if status == "CONNECTED" {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" class=\"animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-green-400\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" class=\"animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-red-400\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("></span> <span")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if status == "CONNECTED" {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" class=\"relative inline-flex rounded-full h-3 w-3 bg-green-500\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" class=\"relative inline-flex rounded-full h-3 w-3 bg-red-500\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("></span></span></div></div></div><div class=\"flex ml-auto mr-auto block max-w-2xl p-6 bg-white border border-gray-200 rounded-lg shadow mt-5\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

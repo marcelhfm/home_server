@@ -26,18 +26,19 @@ func getDatasources(db *sql.DB) ([]types.Datasource, error) {
 	for rows.Next() {
 		var id int
 		var name string
-		err = rows.Scan(&id, &name)
+		var status string
+		err = rows.Scan(&id, &name, &status)
 		if err != nil {
 			return nil, err
 		}
 
-		datasourceArry = append(datasourceArry, types.Datasource{Id: id, Name: name})
+		datasourceArry = append(datasourceArry, types.Datasource{Id: id, Name: name, Status: status})
 	}
 
 	return datasourceArry, nil
 }
 
-func getLastSeen(db *sql.DB, datasources []types.Datasource) ([]types.DatasourceLastSeen, error) {
+func getLastSeen(db *sql.DB, datasources []types.Datasource) ([]types.Datasource, error) {
 	if len(datasources) == 0 {
 		return nil, fmt.Errorf("datasources list empty")
 	}
@@ -57,7 +58,6 @@ func getLastSeen(db *sql.DB, datasources []types.Datasource) ([]types.Datasource
 	}
 	defer rows.Close()
 
-	var results []types.DatasourceLastSeen
 	foundDatasources := make(map[int]time.Time)
 
 	for rows.Next() {
@@ -79,20 +79,18 @@ func getLastSeen(db *sql.DB, datasources []types.Datasource) ([]types.Datasource
 		return nil, err
 	}
 
-	for _, ds := range datasources {
+	for i := range datasources {
+		ds := datasources[i]
 		last_seen, found := foundDatasources[ds.Id]
 
-		localTime := last_seen.In(loc)
-		formattedTime := localTime.Format("15:04")
-
-		if !found {
-			results = append(results, types.DatasourceLastSeen{Datasource: ds, Last_seen: ""})
-		} else {
-			results = append(results, types.DatasourceLastSeen{Datasource: ds, Last_seen: formattedTime})
+		if found {
+			localTime := last_seen.In(loc)
+			formattedTime := localTime.Format("15:04")
+			datasources[i].Last_seen = formattedTime
 		}
 	}
 
-	return results, nil
+	return datasources, nil
 }
 
 func IndexHandler(db *sql.DB) http.HandlerFunc {

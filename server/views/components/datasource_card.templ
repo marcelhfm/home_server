@@ -4,13 +4,31 @@ import (
   "fmt"
 )
 
-templ DatasourceCard(name string, id string, last_seen string) {
-  <a href={ templ.URL(fmt.Sprintf("/ds/%s?name=%s", id, name)) } class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{name}</h5>
-    if last_seen != "" {
-      <p class="font-normal text-gray-700 dark:text-gray-400">Last seen: { last_seen }</p>
-    } else {
-      <p class="font-normal text-gray-700 dark:text-gray-400">Last seen: never</p>
-    }
+templ DatasourceCard(name string, id string, last_seen string, status string) {
+  <a href={ templ.URL(fmt.Sprintf("/ds/%s?name=%s", id, name)) } class="relative block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    <div class="flex items-center">
+      <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{name}</h5>
+      <span class="relative flex h-3 w-3 mb-2 ml-5">
+        <span 
+          if (status == "CONNECTED") {
+            class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-green-400"
+          } else {
+            class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-red-400"
+          }
+        ></span>
+        <span 
+          if (status == "CONNECTED") {
+            class="relative inline-flex rounded-full h-3 w-3 bg-green-500"
+          } else {
+            class="relative inline-flex rounded-full h-3 w-3 bg-red-500"
+          }
+        ></span>
+      </span>
+    </div>
+      if last_seen != "" {
+        <p class="font-normal text-gray-700 dark:text-gray-400">Last seen: { last_seen }</p>
+      } else {
+        <p class="font-normal text-gray-700 dark:text-gray-400">Last seen: never</p>
+      }
   </a>
 }

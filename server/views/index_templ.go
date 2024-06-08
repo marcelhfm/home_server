@@ -16,7 +16,7 @@ import (
 	"github.com/marcelhfm/home_server/views/components"
 )
 
-func Index(datasourcesLastSeen []types.DatasourceLastSeen) templ.Component {
+func Index(datasourcesLastSeen []types.Datasource) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -45,7 +45,7 @@ func Index(datasourcesLastSeen []types.DatasourceLastSeen) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"max-w-2xl flex ml-auto mr-auto mt-8\"><div class=\"w-full\"><p class=\"text-lg font-medium mb-2 ml-auto mr-auto\">Datasources</p><div class=\"flex w-full\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"max-w-2xl flex ml-auto mr-auto mt-8\"><div class=\"w-full ml-2\"><p class=\"text-lg font-medium mb-2 ml-auto mr-auto\">Datasources</p><div class=\"flex w-full\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -54,7 +54,7 @@ func Index(datasourcesLastSeen []types.DatasourceLastSeen) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = components.DatasourceCard(datasource.Datasource.Name, fmt.Sprint(datasource.Datasource.Id), datasource.Last_seen).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = components.DatasourceCard(datasource.Name, fmt.Sprint(datasource.Id), datasource.Last_seen, datasource.Status).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

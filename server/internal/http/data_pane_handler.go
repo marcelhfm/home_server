@@ -144,7 +144,7 @@ func DataPaneHandler(db *sql.DB) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 
-		err = components.DatasourceDataPane(chart, lastCo2, display_status, last_seen).Render(r.Context(), w)
+		err = components.DatasourceDataPane(chart, lastCo2, display_status, last_seen, "CONNECTED").Render(r.Context(), w)
 
 		if err != nil {
 			fmt.Println("DataPaneHandler: ", err)
