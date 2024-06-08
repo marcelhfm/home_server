@@ -26,5 +26,5 @@ jobs:
         run: cd server && go mod download
 
       - name: Run tests
-        run: go test ./...
+        run: cd server && go test ./...
 
