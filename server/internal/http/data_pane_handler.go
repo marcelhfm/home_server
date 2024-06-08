@@ -129,6 +129,19 @@ func getTimeseriesData(db *sql.DB, dsId string) ([]TimeseriesData, error) {
 	return res, nil
 }
 
+func getDsStatus(db *sql.DB, dsId string) (string, error) {
+	statusQuery := fmt.Sprintf("SELECT status FROM datasources WHERE id = %s LIMIT 1", dsId)
+
+	var status string
+	err := db.QueryRow(statusQuery).Scan(&status)
+
+	if err != nil {
+		return "", nil
+	}
+
+	return status, nil
+}
+
 func DataPaneHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		dsId := r.PathValue("id")
@@ -144,7 +157,13 @@ func DataPaneHandler(db *sql.DB) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 
-		err = components.DatasourceDataPane(chart, lastCo2, display_status, last_seen, "CONNECTED").Render(r.Context(), w)
+		status, err := getDsStatus(db, dsId)
+		if err != nil {
+			fmt.Println("DataPaneHandler: ", err.Error())
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+
+		err = components.DatasourceDataPane(chart, lastCo2, display_status, last_seen, status).Render(r.Context(), w)
 
 		if err != nil {
 			fmt.Println("DataPaneHandler: ", err)

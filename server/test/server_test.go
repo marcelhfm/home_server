@@ -55,13 +55,21 @@ func startPostgresContainer(t *testing.T) (testcontainers.Container, *sql.DB) {
 
 	db, err := sql.Open("postgres", psqlInfo)
 
-	db.Exec(`CREATE TABLE IF NOT EXISTS timeseries (
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS timeseries (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   datasource_id INT NOT NULL,
   metric VARCHAR NOT NULL,
   value JSONB NOT NULL,
   timestamp TIMESTAMPTZ NOT NULL
 );`)
+
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS datasources (
+  id INT PRIMARY KEY,
+  name TEXT NOT NULL,
+  status TEXT NOT NULL
+);`)
+
+	db.Exec(`INSERT INTO datasources (id, name, status) VALUES (1, 'pico_w', 'DISCONNECTED')`)
 
 	require.NoError(t, err)
 
