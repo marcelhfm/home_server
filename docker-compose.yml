@@ -38,7 +38,7 @@ services:
       - .env
     ports:
       - "5001:5001"
-      - "12345:12345"
+      - "12345:12345/udp"
     environment:
       - PQ_HOST=${PQ_HOST}
       - PQ_PORT=${PQ_PORT}
