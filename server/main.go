@@ -9,6 +9,7 @@ import (
 	"github.com/marcelhfm/home_server/internal/db"
 	"github.com/marcelhfm/home_server/internal/http"
 	"github.com/marcelhfm/home_server/internal/tcp"
+	"github.com/marcelhfm/home_server/internal/udp"
 	"github.com/marcelhfm/home_server/pkg/types"
 )
 
@@ -25,5 +26,6 @@ func main() {
 	commandResponseChannel := make(chan types.CommandResponse)
 
 	go tcp.StartTCPServer(db, commandChannel, commandResponseChannel)
+	go udp.StartLogServer()
 	http.StartHttpServer(db, commandChannel, commandResponseChannel)
 }
