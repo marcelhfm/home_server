@@ -26,6 +26,6 @@ func main() {
 	commandResponseChannel := make(chan types.CommandResponse)
 
 	go tcp.StartTCPServer(db, commandChannel, commandResponseChannel)
-	go udp.StartLogServer()
+	go udp.StartLogServer(db)
 	http.StartHttpServer(db, commandChannel, commandResponseChannel)
 }
