@@ -26,14 +26,20 @@ func ingestLogs(db *sql.DB, datasourceId int, message string, ts string) {
 }
 
 func parseMessage(message string) (int, string, error) {
-	slices := strings.Split(message, ";")
+	dsIdString := string(message[0])
+	var parsedMessage string
 
-	dsId, err := strconv.Atoi(slices[0])
+	runes := []rune(message)
+	if len(runes) > 1 {
+		parsedMessage = string(runes[2:])
+	}
+
+	dsId, err := strconv.Atoi(dsIdString)
 	if err != nil {
 		return -1, "", err
 	}
 
-	return dsId, slices[1], err
+	return dsId, parsedMessage, err
 }
 
 func StartLogServer(db *sql.DB) {
