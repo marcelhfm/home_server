@@ -1,0 +1,25 @@
+package components
+
+import "github.com/marcelhfm/home_server/pkg/types"
+
+
+templ LogComponent(dsId string, logs []types.FormattedLogs, data bool) {
+
+  <div id="data-pane" class="mt-8">
+    <div class="w-full">
+      <div class="flex max-w-2xl ml-auto mr-auto">
+        if data {
+          <div class="bg-black px-4">
+            <ul>
+              for _, item := range logs {
+                <li class={ item.Color }>{item.Message}</li>
+              }
+            </ul>
+          </div>
+        } else {
+          <div id="alert" class="w-full bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">No Data</div>
+        }
+      </div>
+    </div>
+  </div>
+}

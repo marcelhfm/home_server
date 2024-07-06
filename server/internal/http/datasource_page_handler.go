@@ -15,7 +15,7 @@ type TimeseriesResponse struct {
 	Timestamp     string
 }
 
-func DatasourceHandler(db *sql.DB) http.HandlerFunc {
+func DatasourcePageHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		dsId := r.PathValue("id")
 		dsName := r.URL.Query().Get("name")
