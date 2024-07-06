@@ -3,3 +3,4 @@ server/bin
 server/tmp
 deploy.sh
 run_migrations.sh
+.DS_Store
