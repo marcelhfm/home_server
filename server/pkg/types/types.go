@@ -27,3 +27,8 @@ type Datasource struct {
 	Status    string
 	Last_seen string
 }
+
+type FormattedLogs struct {
+	Message string
+	Color   string
+}

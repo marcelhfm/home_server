@@ -1,0 +1,54 @@
+package views
+
+import (
+  "github.com/marcelhfm/home_server/views/components"
+	"fmt"
+)
+
+templ LogPage(id string, name string) {
+ <!DOCTYPE html>
+    <html lang="en">
+        @components.Header()
+        <body>
+            <main class="min-h-screen w-full">
+                @components.Topbar()
+                <div class="p-4 mt-2">
+                  <div class="flex w-full max-w-2xl items-center ml-auto mr-auto">
+                    <div class="flex items-center">
+                      <a href="/">
+                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 19-7-7 7-7"/>
+                        </svg>
+                      </a>
+
+                      <p class="text-lg font-medium">{name}</p>
+                    </div>
+                  </div>
+
+                  <ul class="max-w-2xl ml-auto mr-auto mb-4 mt-8 flex flex-wrap text-sm font-medium text-center text-gray-500 border-b border-gray-200">
+                      <li class="me-2">
+                          <a href={ templ.URL(fmt.Sprintf("/ds/%s?name=%s", id, name)) } aria-current="page" class="inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50">Data</a>
+                      </li>
+                      <li class="me-2">
+                          <a href="#" class="inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active">Logs</a>
+                      </li>
+                  </ul>
+
+                  <form class="max-w-2xl mx-auto">
+                    <label for="timerange" class="block mb-2 text-sm font-medium text-gray-900">Select timerange</label>
+                    <select id="timerange" name="timerange" hx-get={ string(templ.URL(fmt.Sprintf("/api/ds/%s/logs", id))) } hx-params="*" hx-trigger="change" hx-target="#log-pane" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                      <option selected value="0">Latest</option>
+                      <option value="0.5">Last 30 min</option>
+                      <option value="1">Last hour</option>
+                      <option value="24">Last day</option>
+                    </select>
+                  </form>
+
+                  <div id="log-pane" hx-get={ string(templ.URL(fmt.Sprintf("/api/ds/%s/logs?timerange=0", id))) } hx-trigger="load">
+                    Loading...
+                 </div>
+                </div>
+            </main>
+        </body>
+    </html>
+}
