@@ -93,7 +93,7 @@ func getLastSeen(db *sql.DB, datasources []types.Datasource) ([]types.Datasource
 	return datasources, nil
 }
 
-func IndexHandler(db *sql.DB) http.HandlerFunc {
+func IndexPageHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		datasources, err := getDatasources(db)
 		if err != nil {

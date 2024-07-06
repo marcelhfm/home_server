@@ -142,13 +142,20 @@ func getDsStatus(db *sql.DB, dsId string) (string, error) {
 	return status, nil
 }
 
-func DataPaneHandler(db *sql.DB) http.HandlerFunc {
+func ApiDataPaneHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		dsId := r.PathValue("id")
+		dsName := r.URL.Query().Get("name")
 		data, err := getTimeseriesData(db, dsId)
 		if err != nil {
 			fmt.Println("DataPaneHandler: ", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+
+		if len(data) == 0 {
+			fmt.Printf("DataPaneHandler: datasource %s has no timeseries data\n", dsId)
+			components.DatasourceDataPane(dsId, dsName, "", 0, 0, "", "", false).Render(r.Context(), w)
+			return
 		}
 
 		chart, lastCo2, display_status, last_seen, err := generateChart(data)
@@ -163,7 +170,7 @@ func DataPaneHandler(db *sql.DB) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 
-		err = components.DatasourceDataPane(chart, lastCo2, display_status, last_seen, status).Render(r.Context(), w)
+		err = components.DatasourceDataPane(dsId, dsName, chart, lastCo2, display_status, last_seen, status, true).Render(r.Context(), w)
 
 		if err != nil {
 			fmt.Println("DataPaneHandler: ", err)

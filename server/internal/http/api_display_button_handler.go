@@ -34,7 +34,7 @@ func getDisplayStatus(db *sql.DB, dsId string) (bool, error) {
 	return false, nil
 }
 
-func DisplayButtonHandler(db *sql.DB) http.HandlerFunc {
+func ApiDisplayButtonHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			fmt.Println("DisplayButtonHandler: Received req with wrong method")
