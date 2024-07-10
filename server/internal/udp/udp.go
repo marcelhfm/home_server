@@ -14,7 +14,6 @@ const (
 )
 
 func ingestLogs(db *sql.DB, datasourceId int, message string, ts string) {
-
 	sqlStatement := `INSERT INTO logs (datasource_id, message, timestamp) VALUES ($1, $2, $3)`
 
 	_, err := db.Exec(sqlStatement, datasourceId, message, ts)
@@ -63,9 +62,10 @@ func StartLogServer(db *sql.DB) {
 			continue
 		}
 		message := string(buffer[:n])
+		log.Printf("UDP: Received message %s\n", message)
 		dsId, message, err := parseMessage(message)
 		if err != nil {
-			log.Printf("UDP: Error parsing message. err: %s", err)
+			log.Printf("UDP: Error parsing message. err: %s\n", err)
 			continue
 		}
 

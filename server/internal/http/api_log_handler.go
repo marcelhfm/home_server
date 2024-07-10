@@ -47,7 +47,7 @@ func getLogs(db *sql.DB, dsId string, timerange string) ([]LogData, error) {
 		res = append(res, LogData{Message: message, Timestamp: ts})
 	}
 
-	fmt.Printf("ApiLogHandler: Got %d log messages for range %s and ds %s", len(res), timerange, dsId)
+	fmt.Printf("ApiLogHandler: Got %d log messages for range %s and ds %s\n", len(res), timerange, dsId)
 	return res, nil
 }
 
@@ -113,7 +113,7 @@ func ApiLogHandler(db *sql.DB) http.HandlerFunc {
 		logs, err := getLogs(db, dsId, formattedTimeRange)
 
 		if err != nil {
-			fmt.Println("ApiLogHandler: ", err)
+			fmt.Println("ApiLogHandler: \n", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 
@@ -126,7 +126,7 @@ func ApiLogHandler(db *sql.DB) http.HandlerFunc {
 		}
 
 		if err != nil {
-			fmt.Println("ApiLogHandler: ", err)
+			fmt.Println("ApiLogHandler: \n", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}
