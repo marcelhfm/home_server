@@ -100,7 +100,7 @@ func TestTcpServer(t *testing.T) {
 
 	fmt.Fprintf(conn, "1,400,22,60,1\n")
 
-	time.Sleep(1 * time.Second)
+	time.Sleep(3 * time.Second)
 
 	id := uuid.New()
 
