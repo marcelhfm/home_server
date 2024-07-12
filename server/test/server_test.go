@@ -54,6 +54,9 @@ func startPostgresContainer(t *testing.T) (testcontainers.Container, *sql.DB) {
 	)
 
 	db, err := sql.Open("postgres", psqlInfo)
+	require.NoError(t, err)
+
+	time.Sleep(1 * time.Second)
 
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS timeseries (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -100,7 +103,7 @@ func TestTcpServer(t *testing.T) {
 
 	fmt.Fprintf(conn, "1,400,22,60,1\n")
 
-	time.Sleep(3 * time.Second)
+	time.Sleep(1 * time.Second)
 
 	id := uuid.New()
 
