@@ -66,29 +66,42 @@ func LogPage(id string, name string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" aria-current=\"page\" class=\"inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50\">Data</a></li><li class=\"me-2\"><a href=\"#\" class=\"inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active\">Logs</a></li></ul><form class=\"max-w-2xl mx-auto\"><label for=\"timerange\" class=\"block mb-2 text-sm font-medium text-gray-900\">Select timerange</label> <select id=\"timerange\" name=\"timerange\" hx-get=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" aria-current=\"page\" class=\"inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50\">Data</a></li><li class=\"me-2\"><a href=\"#\" class=\"inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active\">Logs</a></li></ul><form class=\"max-w-2xl mx-auto\"><div class=\"mb-4\"><label for=\"timerange\" class=\"block mb-2 text-sm font-medium text-gray-900\">Select timerange</label> <select id=\"timerange\" name=\"timerange\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL(fmt.Sprintf("/api/ds/%s/logs", id))))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log_page.templ`, Line: 39, Col: 122}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log_page.templ`, Line: 40, Col: 124}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-params=\"*\" hx-trigger=\"change\" hx-target=\"#log-pane\" class=\"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5\"><option selected value=\"0\">Latest</option> <option value=\"0.5\">Last 30 min</option> <option value=\"1\">Last hour</option> <option value=\"24\">Last day</option></select></form><div id=\"log-pane\" hx-get=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-params=\"*\" hx-trigger=\"change\" hx-target=\"#log-pane\" hx-include=\"[name=&#39;loglevel&#39;]\" class=\"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5\"><option selected value=\"0\">Latest</option> <option value=\"0.5\">Last 30 min</option> <option value=\"1\">Last hour</option> <option value=\"24\">Last day</option></select></div><div class=\"mb-4\"><label for=\"loglevel\" class=\"block mb-2 text-sm font-medium text-gray-900\">Select log level</label> <select id=\"loglevel\" name=\"loglevel\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL(fmt.Sprintf("/api/ds/%s/logs?timerange=0", id))))
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL(fmt.Sprintf("/api/ds/%s/logs", id))))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log_page.templ`, Line: 47, Col: 111}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log_page.templ`, Line: 50, Col: 122}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-params=\"*\" hx-trigger=\"change\" hx-target=\"#log-pane\" hx-include=\"[name=&#39;timerange&#39;]\" class=\"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5\"><option selected value=\"all\">All</option> <option value=\"info\">Info</option> <option value=\"warning\">Warning</option> <option value=\"error\">Error</option> <option value=\"debug\">Debug</option></select></div></form><div id=\"log-pane\" hx-get=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var6 string
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL(fmt.Sprintf("/api/ds/%s/logs?timerange=0", id))))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log_page.templ`, Line: 60, Col: 111}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

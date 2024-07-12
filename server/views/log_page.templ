@@ -34,14 +34,27 @@ templ LogPage(id string, name string) {
                       </li>
                   </ul>
 
-                  <form class="max-w-2xl mx-auto">
-                    <label for="timerange" class="block mb-2 text-sm font-medium text-gray-900">Select timerange</label>
-                    <select id="timerange" name="timerange" hx-get={ string(templ.URL(fmt.Sprintf("/api/ds/%s/logs", id))) } hx-params="*" hx-trigger="change" hx-target="#log-pane" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                      <option selected value="0">Latest</option>
-                      <option value="0.5">Last 30 min</option>
-                      <option value="1">Last hour</option>
-                      <option value="24">Last day</option>
-                    </select>
+                 <form class="max-w-2xl mx-auto">
+                    <div class="mb-4">
+                      <label for="timerange" class="block mb-2 text-sm font-medium text-gray-900">Select timerange</label>
+                      <select id="timerange" name="timerange" hx-get={ string(templ.URL(fmt.Sprintf("/api/ds/%s/logs", id))) } hx-params="*" hx-trigger="change" hx-target="#log-pane" hx-include="[name='loglevel']" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        <option selected value="0">Latest</option>
+                        <option value="0.5">Last 30 min</option>
+                        <option value="1">Last hour</option>
+                        <option value="24">Last day</option>
+                      </select>
+                    </div>
+
+                    <div class="mb-4">
+                      <label for="loglevel" class="block mb-2 text-sm font-medium text-gray-900">Select log level</label>
+                      <select id="loglevel" name="loglevel" hx-get={ string(templ.URL(fmt.Sprintf("/api/ds/%s/logs", id))) } hx-params="*" hx-trigger="change" hx-target="#log-pane" hx-include="[name='timerange']" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        <option selected value="all">All</option>
+                        <option value="info">Info</option>
+                        <option value="warning">Warning</option>
+                        <option value="error">Error</option>
+                        <option value="debug">Debug</option>
+                      </select>
+                    </div>
                   </form>
 
                   <div id="log-pane" hx-get={ string(templ.URL(fmt.Sprintf("/api/ds/%s/logs?timerange=0", id))) } hx-trigger="load">

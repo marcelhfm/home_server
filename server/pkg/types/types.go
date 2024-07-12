@@ -29,6 +29,8 @@ type Datasource struct {
 }
 
 type FormattedLogs struct {
-	Message string
-	Color   string
+	Message   string
+	Timestamp string
+	Level     string
+	Color     string
 }

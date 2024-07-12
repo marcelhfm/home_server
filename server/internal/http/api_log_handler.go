@@ -17,16 +17,33 @@ type LogData struct {
 	Timestamp string
 }
 
-func getLogs(db *sql.DB, dsId string, timerange string) ([]LogData, error) {
+func getLogs(db *sql.DB, dsId string, timerange string, level string) ([]LogData, error) {
 	fmt.Println("ApiLogHandler: Fetching logs for ds", dsId)
+
+	var where_level string = ""
+
+	if level == "info" {
+		where_level = "AND message LIKE '%[0;32m%'"
+	}
+	if level == "debug" {
+		where_level = "AND message LIKE '%[0;34m%'"
+	}
+	if level == "error" {
+		where_level = "AND message LIKE '%[0;31m%'"
+	}
+	if level == "warning" {
+		where_level = "AND message LIKE '%[0;33m%'"
+	}
 
 	var logQuery string
 
 	if timerange == "0" {
-		logQuery = fmt.Sprintf("SELECT message, timestamp FROM logs WHERE datasource_id = %s ORDER BY timestamp desc LIMIT 1000", dsId)
+		logQuery = fmt.Sprintf("SELECT message, timestamp FROM logs WHERE datasource_id = %s %s ORDER BY timestamp desc LIMIT 1000", dsId, where_level)
 	} else {
-		logQuery = fmt.Sprintf("SELECT message, timestamp FROM logs WHERE datasource_id = %s AND timestamp >=NOW() - INTERVAL '%s' ORDER BY timestamp desc LIMIT 1000", dsId, timerange)
+		logQuery = fmt.Sprintf("SELECT message, timestamp FROM logs WHERE datasource_id = %s AND timestamp >=NOW() - INTERVAL '%s' %s ORDER BY timestamp desc LIMIT 1000", dsId, timerange, where_level)
 	}
+
+	fmt.Println(logQuery)
 
 	rows, err := db.Query(logQuery)
 	if err != nil {
@@ -66,24 +83,20 @@ func timeRangeToPqInterval(timerange string) string {
 	}
 }
 
-func getColorFromCode(str string) string {
-	colorCodes := map[string]string{
-		"\x1b[0;30m": "text-black-600",
-		"\x1b[0;31m": "text-red-600",
-		"\x1b[0;32m": "text-green-600",
-		"\x1b[0;33m": "text-yellow-600",
-		"\x1b[0;34m": "text-blue-600",
-		"\x1b[0;35m": "text-magenta-600",
-		"\x1b[0;36m": "text-cyan-600",
-		"\x1b[0;37m": "text-white-600",
+func getColorFromCode(str string) (string, string) {
+	colorCodes := map[string][2]string{
+		"\x1b[0;31m": {"text-red-600", "ERROR"},
+		"\x1b[0;32m": {"text-green-600", "INFO"},
+		"\x1b[0;33m": {"text-yellow-600", "WARN"},
+		"\x1b[0;34m": {"text-blue-600", "DEBUG"},
 	}
 
-	for code, color := range colorCodes {
+	for code, colorLevel := range colorCodes {
 		if strings.Contains(str, code) {
-			return color
+			return colorLevel[0], colorLevel[1]
 		}
 	}
-	return "unknown"
+	return "unknown", "UNKNOWN"
 }
 
 func removeAnsiCodes(str string) string {
@@ -94,9 +107,9 @@ func removeAnsiCodes(str string) string {
 func formatMessages(messages []LogData) []types.FormattedLogs {
 	var results []types.FormattedLogs
 	for _, message := range messages {
-		color := getColorFromCode(message.Message)
+		color, level := getColorFromCode(message.Message)
 
-		results = append(results, types.FormattedLogs{Message: fmt.Sprintf("[%s] %s", message.Timestamp, removeAnsiCodes(message.Message)), Color: color})
+		results = append(results, types.FormattedLogs{Message: removeAnsiCodes(message.Message), Color: color, Timestamp: message.Timestamp, Level: level})
 	}
 
 	return results
@@ -106,11 +119,12 @@ func ApiLogHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		dsId := r.PathValue("id")
 		timeRange := r.URL.Query().Get("timerange")
-		fmt.Printf("ApiLogHandler: Called for ds %s and range: %s\n", dsId, timeRange)
+		level := r.URL.Query().Get("loglevel")
+		fmt.Printf("ApiLogHandler: Called for ds %s, level %s and range: %s\n", dsId, level, timeRange)
 
 		formattedTimeRange := timeRangeToPqInterval(timeRange)
 
-		logs, err := getLogs(db, dsId, formattedTimeRange)
+		logs, err := getLogs(db, dsId, formattedTimeRange, level)
 
 		if err != nil {
 			fmt.Println("ApiLogHandler: \n", err)
