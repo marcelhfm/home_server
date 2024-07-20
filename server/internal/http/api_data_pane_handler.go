@@ -201,7 +201,7 @@ func ApiDataPaneHandler(db *sql.DB) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 
-		data, err := getTimeseriesData(db, dsId)
+		data, err := getTimeseriesData(db, dsId, dsType)
 		if err != nil {
 			fmt.Println("DataPaneHandler: ", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
