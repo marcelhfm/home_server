@@ -142,10 +142,16 @@ type TimeseriesData struct {
 	Timestamp string
 }
 
-func getTimeseriesData(db *sql.DB, dsId string) ([]TimeseriesData, error) {
+func getTimeseriesData(db *sql.DB, dsId string, dsType string) ([]TimeseriesData, error) {
 	fmt.Println("DataPaneHandler: Fetching timeseries data for ds", dsId)
 
-	timeseriesQuery := fmt.Sprintf("SELECT metric, value, timestamp FROM timeseries WHERE datasource_id = %s AND timestamp >=NOW() - INTERVAL '30 minutes' ORDER BY timestamp desc", dsId)
+	var timeseriesQuery string
+
+	if dsType == "CO2" {
+		timeseriesQuery = fmt.Sprintf("SELECT metric, value, timestamp FROM timeseries WHERE datasource_id = %s AND timestamp >=NOW() - INTERVAL '30 minutes' ORDER BY timestamp desc", dsId)
+	} else {
+		timeseriesQuery = fmt.Sprintf("SELECT metric, value, timestamp FROM timeseries WHERE datasource_id = %s AND timestamp >=NOW() - INTERVAL '1 day' ORDER BY timestamp desc", dsId)
+	}
 
 	rows, err := db.Query(timeseriesQuery)
 	if err != nil {
