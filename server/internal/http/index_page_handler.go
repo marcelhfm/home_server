@@ -13,7 +13,7 @@ import (
 )
 
 func getDatasources(db *sql.DB) ([]types.Datasource, error) {
-	getDatasourcesQuery := "SELECT * FROM datasources"
+	getDatasourcesQuery := "SELECT id, name, status FROM datasources"
 
 	rows, err := db.Query(getDatasourcesQuery)
 	if err != nil {

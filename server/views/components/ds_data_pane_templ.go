@@ -13,9 +13,11 @@ import "bytes"
 import (
 	"fmt"
 	"strconv"
+
+	"github.com/marcelhfm/home_server/pkg/types"
 )
 
-func DatasourceDataPane(dsId string, dsName string, chart string, co2 int, display_status int, last_seen string, status string, data bool) templ.Component {
+func DatasourceDataPane(props types.DsDataPaneProps) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -28,124 +30,152 @@ func DatasourceDataPane(dsId string, dsName string, chart string, co2 int, displ
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"data-pane\" class=\"mt-8\"><div class=\"w-full\"><ul class=\"max-w-2xl ml-auto mr-auto mb-4 flex flex-wrap text-sm font-medium text-center text-gray-500 border-b border-gray-200\"><li class=\"me-2\"><a href=\"#\" aria-current=\"page\" class=\"inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500\">Data</a></li><li class=\"me-2\"><a href=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"data-pane\" class=\"mt-8\"><div class=\"w-full\"><ul class=\"max-w-2xl ml-auto mr-auto mb-4 flex flex-wrap text-sm font-medium text-center text-gray-500 border-b border-gray-200\"><li class=\"me-2\"><a href=\"#\" aria-current=\"page\" class=\"inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active\">Data</a></li><li class=\"me-2\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var2 templ.SafeURL = templ.URL(fmt.Sprintf("/ds/%s/logs?name=%s", dsId, dsName))
+		var templ_7745c5c3_Var2 templ.SafeURL = templ.URL(fmt.Sprintf("/ds/%s/logs?name=%s", props.DsId, props.DsName))
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var2)))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300\">Logs</a></li></ul><div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50\">Logs</a></li></ul><div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if data {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex max-w-2xl ml-auto mr-auto\"><div class=\"block w-full p-6 bg-white border border-gray-200 rounded-lg shadow mr-2 sm:mr-10\">")
+		if props.Data {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex max-w-2xl ml-auto mr-auto\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if co2 > 1200 {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"text-lg text-red-500\">")
+			if props.DsType == "CO2" {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" <div class=\"block w-full p-6 bg-white border border-gray-200 rounded-lg shadow mr-2 sm:mr-10\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var3 string
-				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(co2))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/ds_data_pane.templ`, Line: 27, Col: 66}
+				if props.Co2 > 1200 {
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"text-lg text-red-500\">")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var3 string
+					templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(props.Co2))
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/ds_data_pane.templ`, Line: 30, Col: 76}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				} else {
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"text-lg text-green-500\">")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var4 string
+					templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(props.Co2))
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/ds_data_pane.templ`, Line: 32, Col: 78}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"font-normal text-gray-700\">Current CO2 (ppm)</p></div> <div class=\"block w-full p-6 bg-white border border-gray-200 rounded-lg shadow mr-2 sm:mr-10\"><p class=\"font-normal text-gray-700\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p>")
+				if props.DisplayStatus == 1 {
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("Display: <p class=\"text-green-500 text-lg\">On</p>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				} else {
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("Display: <p class=\"text-red-500 text-lg\">Off</p>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p></div> <div class=\"block w-full p-6 bg-white border border-gray-200 rounded-lg shadow\"><p class=\"font-normal text-gray-700 mr-2\">Last seen:</p><div class=\"flex items-center\"><p class=\"text-lg\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var5 string
+				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(props.LastSeen)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/ds_data_pane.templ`, Line: 53, Col: 55}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p><span class=\"relative flex h-3 w-3 ml-2\"><span")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				if props.Status == "CONNECTED" {
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" class=\"animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-green-400\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				} else {
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" class=\"animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-red-400\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("></span> <span")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				if props.Status == "CONNECTED" {
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" class=\"relative inline-flex rounded-full h-3 w-3 bg-green-500\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				} else {
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" class=\"relative inline-flex rounded-full h-3 w-3 bg-red-500\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("></span></span></div></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"text-lg text-green-500\">")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" <div class=\"block w-full p-6 bg-white border border-gray-200 rounded-lg shadow\"><p class=\"text-lg text-gray-700\">Last Moisture: ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var4 string
-				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(co2))
+				var templ_7745c5c3_Var6 string
+				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(props.Moisture / 100))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/ds_data_pane.templ`, Line: 29, Col: 68}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/ds_data_pane.templ`, Line: 75, Col: 104}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p>")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("%</p></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"font-normal text-gray-700 dark:text-gray-400\">Current CO2 (ppm)</p></div><div class=\"block w-full p-6 bg-white border border-gray-200 rounded-lg shadow mr-2 sm:mr-10\"><p class=\"font-normal text-gray-700 dark:text-gray-400\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><div class=\"flex ml-auto mr-auto block max-w-2xl p-6 bg-white border border-gray-200 rounded-lg shadow mt-5\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if display_status == 1 {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("Display: <p class=\"text-green-500 text-lg\">On</p>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			} else {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("Display: <p class=\"text-red-500 text-lg\">Off</p>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p></div><div class=\"block w-full p-6 bg-white border border-gray-200 rounded-lg shadow\"><p class=\"font-normal text-gray-700 mr-2\">Last seen:</p><div class=\"flex items-center\"><p class=\"text-lg\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var5 string
-			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(last_seen)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/ds_data_pane.templ`, Line: 46, Col: 46}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p><span class=\"relative flex h-3 w-3 ml-2\"><span")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			if status == "CONNECTED" {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" class=\"animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-green-400\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			} else {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" class=\"animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-red-400\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("></span> <span")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			if status == "CONNECTED" {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" class=\"relative inline-flex rounded-full h-3 w-3 bg-green-500\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			} else {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" class=\"relative inline-flex rounded-full h-3 w-3 bg-red-500\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("></span></span></div></div></div><div class=\"flex ml-auto mr-auto block max-w-2xl p-6 bg-white border border-gray-200 rounded-lg shadow mt-5\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templ.Raw(chart).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = templ.Raw(props.Chart).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

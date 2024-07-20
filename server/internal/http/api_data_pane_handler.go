@@ -11,14 +11,25 @@ import (
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
 
+	"github.com/marcelhfm/home_server/pkg/types"
 	"github.com/marcelhfm/home_server/views/components"
 )
 
-func generateChart(data []TimeseriesData) (string, int, int, string, error) {
+type GenerateChartReturn struct {
+	Chart         string
+	LastCo2       int
+	DisplayStatus int
+	LastMoisture  int
+	LastSeen      string
+	Error         error
+}
+
+func generateChart(data []TimeseriesData, dsType string) GenerateChartReturn {
 	lineChart := charts.NewLine()
 
 	var co2 []opts.LineData
 	var humidity []opts.LineData
+	var moisture []opts.LineData
 	var temp []opts.LineData
 	var timestamps []string
 	var lastCo2 int
@@ -32,12 +43,12 @@ func generateChart(data []TimeseriesData) (string, int, int, string, error) {
 
 			loc, err := time.LoadLocation("Europe/Berlin")
 			if err != nil {
-				return "", 0, 0, "", err
+				return GenerateChartReturn{Error: err}
 			}
 
 			t, err := time.Parse(time.RFC3339, el.Timestamp)
 			if err != nil {
-				return "", 0, 0, "", err
+				return GenerateChartReturn{Error: err}
 			}
 
 			localTime := t.In(loc)
@@ -46,23 +57,35 @@ func generateChart(data []TimeseriesData) (string, int, int, string, error) {
 			timestamps = append(timestamps, formattedTime)
 		}
 
-		switch el.Metric {
-		case "co2":
-			co2 = append(co2, opts.LineData{Value: el.Value})
-			break
-		case "humidity":
-			humidity = append(humidity, opts.LineData{Value: el.Value})
-			break
-		case "temperature":
-			temp = append(temp, opts.LineData{Value: el.Value})
-			break
-		default:
+		if dsType == "IRRIGATION" {
+			switch el.Metric {
+			case "moisture":
+				moisture = append(moisture, opts.LineData{Value: el.Value / 100})
+				break
+			default:
+				break
+			}
+		} else {
+			switch el.Metric {
+			case "co2":
+				co2 = append(co2, opts.LineData{Value: el.Value})
+				break
+			case "humidity":
+				humidity = append(humidity, opts.LineData{Value: el.Value})
+				break
+			case "temperature":
+				temp = append(temp, opts.LineData{Value: el.Value})
+				break
+			default:
+			}
 		}
 	}
 
 	// Find last display_status and co2
 	co2found := false
 	displayFound := false
+	moistureFound := false
+	var lastMoisture int
 	for _, el := range data {
 		if el.Metric == "co2" && !co2found {
 			lastCo2 = el.Value
@@ -74,25 +97,43 @@ func generateChart(data []TimeseriesData) (string, int, int, string, error) {
 			displayFound = true
 		}
 
-		if displayFound && co2found {
+		if el.Metric == "moisture" && !moistureFound {
+			lastMoisture = el.Value
+			moistureFound = true
+		}
+
+		if displayFound && co2found && moistureFound {
 			break
 		}
 	}
 
-	lineChart.SetXAxis(timestamps).
-		AddSeries("Co2", co2).
-		AddSeries("Temperature", temp).
-		AddSeries("Humidity", humidity).
-		SetSeriesOptions(charts.WithLineChartOpts(opts.LineChart{Smooth: true, ShowSymbol: true}), charts.WithSeriesAnimation(false))
+	if dsType == "IRRIGATION" {
+		lineChart.SetXAxis(timestamps).
+			AddSeries("Moisture", moisture).
+			SetSeriesOptions(charts.WithLineChartOpts(opts.LineChart{Smooth: true, ShowSymbol: true}), charts.WithSeriesAnimation(false))
+	} else {
+		lineChart.SetXAxis(timestamps).
+			AddSeries("Co2", co2).
+			AddSeries("Temperature", temp).
+			AddSeries("Humidity", humidity).
+			SetSeriesOptions(charts.WithLineChartOpts(opts.LineChart{Smooth: true, ShowSymbol: true}), charts.WithSeriesAnimation(false))
+	}
 
 	var buf bytes.Buffer
 	err := lineChart.Render(&buf)
 
 	if err != nil {
-		return "", 0, 0, "", err
+		return GenerateChartReturn{Error: err}
 	}
 
-	return buf.String(), lastCo2, display_status, timestamps[len(timestamps)-1], nil
+	return GenerateChartReturn{
+		Chart:         buf.String(),
+		LastCo2:       lastCo2,
+		LastMoisture:  lastMoisture,
+		DisplayStatus: display_status,
+		LastSeen:      timestamps[len(timestamps)-1],
+		Error:         nil,
+	}
 }
 
 type TimeseriesData struct {
@@ -129,23 +170,31 @@ func getTimeseriesData(db *sql.DB, dsId string) ([]TimeseriesData, error) {
 	return res, nil
 }
 
-func getDsStatus(db *sql.DB, dsId string) (string, error) {
-	statusQuery := fmt.Sprintf("SELECT status FROM datasources WHERE id = %s LIMIT 1", dsId)
+func getDsStatus(db *sql.DB, dsId string) (string, string, error) {
+	statusQuery := fmt.Sprintf("SELECT status, type FROM datasources WHERE id = %s LIMIT 1", dsId)
 
 	var status string
-	err := db.QueryRow(statusQuery).Scan(&status)
+	var dsType string
+	err := db.QueryRow(statusQuery).Scan(&status, &dsType)
 
 	if err != nil {
-		return "", nil
+		return "", "", err
 	}
 
-	return status, nil
+	return status, dsType, nil
 }
 
 func ApiDataPaneHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		dsId := r.PathValue("id")
 		dsName := r.URL.Query().Get("name")
+
+		status, dsType, err := getDsStatus(db, dsId)
+		if err != nil {
+			fmt.Println("DataPaneHandler: ", err.Error())
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+
 		data, err := getTimeseriesData(db, dsId)
 		if err != nil {
 			fmt.Println("DataPaneHandler: ", err.Error())
@@ -154,23 +203,25 @@ func ApiDataPaneHandler(db *sql.DB) http.HandlerFunc {
 
 		if len(data) == 0 {
 			fmt.Printf("DataPaneHandler: datasource %s has no timeseries data\n", dsId)
-			components.DatasourceDataPane(dsId, dsName, "", 0, 0, "", "", false).Render(r.Context(), w)
+			components.DatasourceDataPane(types.DsDataPaneProps{DsId: dsId, DsName: dsName}).Render(r.Context(), w)
 			return
 		}
 
-		chart, lastCo2, display_status, last_seen, err := generateChart(data)
+		chartStruct := generateChart(data, dsType)
 		if err != nil {
 			fmt.Println("DataPaneHandler: ", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-
-		status, err := getDsStatus(db, dsId)
-		if err != nil {
-			fmt.Println("DataPaneHandler: ", err.Error())
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-
-		err = components.DatasourceDataPane(dsId, dsName, chart, lastCo2, display_status, last_seen, status, true).Render(r.Context(), w)
+		err = components.DatasourceDataPane(types.DsDataPaneProps{DsId: dsId,
+			DsName:        dsName,
+			Chart:         chartStruct.Chart,
+			LastSeen:      chartStruct.LastSeen,
+			Moisture:      chartStruct.LastMoisture,
+			DisplayStatus: chartStruct.DisplayStatus,
+			Status:        status,
+			Data:          true,
+			DsType:        dsType,
+			Co2:           chartStruct.LastCo2}).Render(r.Context(), w)
 
 		if err != nil {
 			fmt.Println("DataPaneHandler: ", err)

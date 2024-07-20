@@ -34,3 +34,16 @@ type FormattedLogs struct {
 	Level     string
 	Color     string
 }
+
+type DsDataPaneProps struct {
+	DsId          string
+	DsName        string
+	Chart         string
+	Co2           int
+	Moisture      int
+	DisplayStatus int
+	LastSeen      string
+	Status        string
+	Data          bool
+	DsType        string
+}

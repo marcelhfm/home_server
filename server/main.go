@@ -8,6 +8,7 @@ import (
 
 	"github.com/marcelhfm/home_server/internal/db"
 	"github.com/marcelhfm/home_server/internal/http"
+	"github.com/marcelhfm/home_server/internal/mqtt"
 	"github.com/marcelhfm/home_server/internal/tcp"
 	"github.com/marcelhfm/home_server/internal/udp"
 	"github.com/marcelhfm/home_server/pkg/types"
@@ -27,5 +28,6 @@ func main() {
 
 	go tcp.StartTCPServer(db, commandChannel, commandResponseChannel)
 	go udp.StartLogServer(db)
+	go mqtt.StartMqttListener(db)
 	http.StartHttpServer(db, commandChannel, commandResponseChannel)
 }

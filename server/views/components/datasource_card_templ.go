@@ -36,14 +36,14 @@ func DatasourceCard(name string, id string, last_seen string, status string) tem
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"relative block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700\"><div class=\"flex items-center\"><h5 class=\"mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"relative block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow\"><div class=\"flex items-center\"><h5 class=\"mb-2 text-2xl font-bold tracking-tight text-gray-900\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/datasource_card.templ`, Line: 10, Col: 92}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/datasource_card.templ`, Line: 10, Col: 76}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -84,14 +84,14 @@ func DatasourceCard(name string, id string, last_seen string, status string) tem
 			return templ_7745c5c3_Err
 		}
 		if last_seen != "" {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"font-normal text-gray-700 dark:text-gray-400\">Last seen: ")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"font-normal text-gray-700\">Last seen: ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(last_seen)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/datasource_card.templ`, Line: 29, Col: 86}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/datasource_card.templ`, Line: 29, Col: 67}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -102,7 +102,7 @@ func DatasourceCard(name string, id string, last_seen string, status string) tem
 				return templ_7745c5c3_Err
 			}
 		} else {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"font-normal text-gray-700 dark:text-gray-400\">Last seen: never</p>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"font-normal text-gray-700\">Last seen: never</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

@@ -30,12 +30,12 @@ func LogComponent(dsId string, logs []types.FormattedLogs, data bool) templ.Comp
 			return templ_7745c5c3_Err
 		}
 		if data {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"relative overflow-x-auto shadow-md sm:rounded-lg\"><table class=\"w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400\"><thead class=\"text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400\"><tr><th scope=\"col\" class=\"px-6 py-3\">Level</th><th scope=\"col\" class=\"px-6 py-3\">Timestamp</th><th scope=\"col\" class=\"px-6 py-3\">Message</th></tr></thead> <tbody>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"relative overflow-x-auto shadow-md sm:rounded-lg\"><table class=\"w-full text-sm text-left rtl:text-right text-gray-500 \"><thead class=\"text-xs text-gray-700 uppercase bg-gray-50\"><tr><th scope=\"col\" class=\"px-6 py-3\">Level</th><th scope=\"col\" class=\"px-6 py-3\">Timestamp</th><th scope=\"col\" class=\"px-6 py-3\">Message</th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for _, item := range logs {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<tr class=\"bg-white border-b dark:bg-gray-800 dark:border-gray-700\"><th scope=\"row\" class=\"font-medium text-gray-900 whitespace-nowrap dark:text-white\"><div class=\"flex px-6 py-4\">")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<tr class=\"bg-white border-b\"><th scope=\"row\" class=\"font-medium text-gray-900 whitespace-nowrap\"><div class=\"flex px-6 py-4\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

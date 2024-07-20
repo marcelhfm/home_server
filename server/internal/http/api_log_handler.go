@@ -43,8 +43,6 @@ func getLogs(db *sql.DB, dsId string, timerange string, level string) ([]LogData
 		logQuery = fmt.Sprintf("SELECT message, timestamp FROM logs WHERE datasource_id = %s AND timestamp >=NOW() - INTERVAL '%s' %s ORDER BY timestamp desc LIMIT 1000", dsId, timerange, where_level)
 	}
 
-	fmt.Println(logQuery)
-
 	rows, err := db.Query(logQuery)
 	if err != nil {
 		return nil, err
