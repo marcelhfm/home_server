@@ -11,6 +11,7 @@ import (
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
 
+	l "github.com/marcelhfm/home_server/pkg/log"
 	"github.com/marcelhfm/home_server/pkg/types"
 	"github.com/marcelhfm/home_server/views/components"
 )
@@ -143,7 +144,7 @@ type TimeseriesData struct {
 }
 
 func getTimeseriesData(db *sql.DB, dsId string, dsType string) ([]TimeseriesData, error) {
-	fmt.Println("DataPaneHandler: Fetching timeseries data for ds", dsId)
+	l.Log.Info().Msgf("Fetching timeseries data for ds", dsId)
 
 	var timeseriesQuery string
 
@@ -197,25 +198,25 @@ func ApiDataPaneHandler(db *sql.DB) http.HandlerFunc {
 
 		status, dsType, err := getDsStatus(db, dsId)
 		if err != nil {
-			fmt.Println("DataPaneHandler: ", err.Error())
+			l.Log.Error().Msgf("Error in DataPaneHandler: %v", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 
 		data, err := getTimeseriesData(db, dsId, dsType)
 		if err != nil {
-			fmt.Println("DataPaneHandler: ", err.Error())
+			l.Log.Error().Msgf("Error in DataPaneHandler: %v", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 
 		if len(data) == 0 {
-			fmt.Printf("DataPaneHandler: datasource %s has no timeseries data\n", dsId)
+			l.Log.Warn().Msgf("Datasource %s has no timeseries data", dsId)
 			components.DatasourceDataPane(types.DsDataPaneProps{DsId: dsId, DsName: dsName}).Render(r.Context(), w)
 			return
 		}
 
 		chartStruct := generateChart(data, dsType)
 		if err != nil {
-			fmt.Println("DataPaneHandler: ", err.Error())
+			l.Log.Error().Msgf("Error in DataPaneHandler: %v", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		err = components.DatasourceDataPane(types.DsDataPaneProps{DsId: dsId,
@@ -230,7 +231,7 @@ func ApiDataPaneHandler(db *sql.DB) http.HandlerFunc {
 			Co2:           chartStruct.LastCo2}).Render(r.Context(), w)
 
 		if err != nil {
-			fmt.Println("DataPaneHandler: ", err)
+			l.Log.Error().Msgf("Error in DataPaneHandler: %v", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}

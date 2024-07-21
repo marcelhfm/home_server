@@ -1,9 +1,9 @@
 package http
 
 import (
-	"fmt"
 	"net/http"
 
+	l "github.com/marcelhfm/home_server/pkg/log"
 	"github.com/marcelhfm/home_server/views"
 )
 
@@ -14,7 +14,7 @@ func LogPageHandler() http.HandlerFunc {
 		err := views.LogPage(dsId, dsName).Render(r.Context(), w)
 
 		if err != nil {
-			fmt.Println("DataPaneHandler: ", err)
+			l.Log.Error().Msgf("Error in DataPaneHandler: %v", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}

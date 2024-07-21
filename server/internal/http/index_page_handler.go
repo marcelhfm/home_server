@@ -8,6 +8,7 @@ import (
 	"time"
 	_ "time/tzdata"
 
+	l "github.com/marcelhfm/home_server/pkg/log"
 	"github.com/marcelhfm/home_server/pkg/types"
 	"github.com/marcelhfm/home_server/views"
 )
@@ -97,7 +98,7 @@ func IndexPageHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		datasources, err := getDatasources(db)
 		if err != nil {
-			fmt.Println("IndexHandler: Error fetching datasources", err)
+			l.Log.Error().Msgf("Error while fetching datasources: %v", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -105,14 +106,14 @@ func IndexPageHandler(db *sql.DB) http.HandlerFunc {
 		datasourcesLastSeen, err := getLastSeen(db, datasources)
 
 		if err != nil {
-			fmt.Println("IndexHandler: Error getting last seen", err)
+			l.Log.Error().Msgf("Error getting last seen: %v", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 
 		err = views.Index(datasourcesLastSeen).Render(r.Context(), w)
 
 		if err != nil {
-			fmt.Println("IndexHandler: Error rendering: ", err)
+			l.Log.Error().Msgf("Error rendering: %v", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}

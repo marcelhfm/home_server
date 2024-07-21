@@ -4,10 +4,12 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+
+	l "github.com/marcelhfm/home_server/pkg/log"
 )
 
 func getDisplayStatus(db *sql.DB, dsId string) (bool, error) {
-	fmt.Printf("DatasourceHandler: Fetching display_status for ds %s\n", dsId)
+	l.Log.Info().Msgf("Fetching display_status for ds %s", dsId)
 	getTimeseriesQuery := fmt.Sprintf("SELECT * FROM timeseries WHERE datasource_id=%s AND metric='display_status' order by timestamp desc LIMIT 1", dsId)
 
 	rows, err := db.Query(getTimeseriesQuery)
@@ -37,7 +39,7 @@ func getDisplayStatus(db *sql.DB, dsId string) (bool, error) {
 func ApiDisplayButtonHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
-			fmt.Println("DisplayButtonHandler: Received req with wrong method")
+			l.Log.Error().Msg("Received req with wrong method")
 			http.Error(w, "Wrong method", http.StatusBadRequest)
 			return
 		}
@@ -50,7 +52,7 @@ func ApiDisplayButtonHandler(db *sql.DB) http.HandlerFunc {
 		display_status, err := getDisplayStatus(db, dsId)
 
 		if err != nil {
-			fmt.Println("DisplayButtonHandler: Error fetching display_status: ", err)
+			l.Log.Error().Msgf("Error fetching display_status: ", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}

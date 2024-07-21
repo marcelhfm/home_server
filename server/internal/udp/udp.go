@@ -2,10 +2,11 @@ package udp
 
 import (
 	"database/sql"
-	"log"
 	"net"
 	"strconv"
 	"time"
+
+	l "github.com/marcelhfm/home_server/pkg/log"
 )
 
 const (
@@ -19,7 +20,7 @@ func ingestLogs(db *sql.DB, datasourceId int, message string, ts string) {
 	_, err := db.Exec(sqlStatement, datasourceId, message, ts)
 
 	if err != nil {
-		log.Printf("db: An error occured while trying to insert into database: %s", err)
+		l.Log.Error().Msgf("db: An error occured while trying to insert into database: %s", err)
 	}
 }
 
@@ -48,24 +49,24 @@ func StartLogServer(db *sql.DB) {
 
 	conn, err := net.ListenUDP("udp", &addr)
 	if err != nil {
-		log.Printf("Error starting UDP server: %v\n", err)
+		l.Log.Error().Msgf("Error starting UDP server: %v", err)
 	}
 	defer conn.Close()
 
-	log.Printf("UDP server listening on %s:%d\n", addr.IP.String(), addr.Port)
+	l.Log.Info().Msgf("UDP server listening on %s:%d", addr.IP.String(), addr.Port)
 
 	buffer := make([]byte, BUF_SIZE)
 	for {
 		n, _, err := conn.ReadFromUDP(buffer)
 		if err != nil {
-			log.Printf("Error reading from UDP: %v\n", err)
+			l.Log.Error().Msgf("Error reading from UDP: %v", err)
 			continue
 		}
 		message := string(buffer[:n])
-		log.Printf("UDP: Received message %s\n", message)
+		l.Log.Debug().Msgf("UDP: Received message %s", message)
 		dsId, message, err := parseMessage(message)
 		if err != nil {
-			log.Printf("UDP: Error parsing message. err: %s\n", err)
+			l.Log.Error().Msgf("UDP: Error parsing message. err: %s", err)
 			continue
 		}
 

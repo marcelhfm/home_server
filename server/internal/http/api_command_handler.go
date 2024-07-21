@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/marcelhfm/home_server/pkg/log"
 	"github.com/marcelhfm/home_server/pkg/types"
 )
 
@@ -22,8 +23,8 @@ var successAlert string = `<div id="alert" class="transition-opacity ease-in dur
 func ApiCommandHandler(commandChannel chan<- types.CommandRequest, commandResponseChannel <-chan types.CommandResponse) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
-			fmt.Println("http: Received request with wrong method")
-			w.Write([]byte(fmt.Sprintf(errorAlert, "Something went wrong :( (Wront http method)")))
+			l.Log.Warn().Msg("http: Received request with wrong method")
+			w.Write([]byte(fmt.Sprintf(errorAlert, "Something went wrong :( (Wrong http method)")))
 			return
 		}
 

@@ -8,6 +8,7 @@ import (
 	"strings"
 	_ "time/tzdata"
 
+	l "github.com/marcelhfm/home_server/pkg/log"
 	"github.com/marcelhfm/home_server/pkg/types"
 	"github.com/marcelhfm/home_server/views/components"
 )
@@ -18,7 +19,7 @@ type LogData struct {
 }
 
 func getLogs(db *sql.DB, dsId string, timerange string, level string) ([]LogData, error) {
-	fmt.Println("ApiLogHandler: Fetching logs for ds", dsId)
+	l.Log.Info().Msgf("Fetching logs for ds", dsId)
 
 	var where_level string = ""
 
@@ -62,7 +63,7 @@ func getLogs(db *sql.DB, dsId string, timerange string, level string) ([]LogData
 		res = append(res, LogData{Message: message, Timestamp: ts})
 	}
 
-	fmt.Printf("ApiLogHandler: Got %d log messages for range %s and ds %s\n", len(res), timerange, dsId)
+	l.Log.Info().Msgf("Got %d log messages for range %s and ds %s", len(res), timerange, dsId)
 	return res, nil
 }
 
@@ -118,14 +119,14 @@ func ApiLogHandler(db *sql.DB) http.HandlerFunc {
 		dsId := r.PathValue("id")
 		timeRange := r.URL.Query().Get("timerange")
 		level := r.URL.Query().Get("loglevel")
-		fmt.Printf("ApiLogHandler: Called for ds %s, level %s and range: %s\n", dsId, level, timeRange)
+		l.Log.Info().Msgf("ApiLogHandler: Called for ds %s, level %s and range: %s", dsId, level, timeRange)
 
 		formattedTimeRange := timeRangeToPqInterval(timeRange)
 
 		logs, err := getLogs(db, dsId, formattedTimeRange, level)
 
 		if err != nil {
-			fmt.Println("ApiLogHandler: \n", err)
+			l.Log.Error().Msgf("Error in ApiLogHandler: %v", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 
@@ -138,7 +139,7 @@ func ApiLogHandler(db *sql.DB) http.HandlerFunc {
 		}
 
 		if err != nil {
-			fmt.Println("ApiLogHandler: \n", err)
+			l.Log.Error().Msgf("Error in ApiLogHandler: %v", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}

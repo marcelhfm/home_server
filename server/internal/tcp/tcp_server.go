@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/marcelhfm/home_server/internal/db"
+	l "github.com/marcelhfm/home_server/pkg/log"
 	"github.com/marcelhfm/home_server/pkg/types"
 )
 
@@ -23,19 +24,19 @@ var mut sync.Mutex
 func StartTCPServer(db *sql.DB, commandChannel <-chan types.CommandRequest, commandResponseChannel chan<- types.CommandResponse) {
 	ln, err := net.Listen("tcp", ":5001")
 	if err != nil {
-		fmt.Println("tcp: Error listening:", err.Error())
+		l.Log.Error().Msgf("tcp: Error listening: %v", err.Error())
 		os.Exit(1)
 	}
 
 	defer ln.Close()
 
-	fmt.Println("TCP server listening on port 5001")
+	l.Log.Info().Msg("TCP server listening on port 5001")
 
 	go func() {
 		for {
 			conn, err := ln.Accept()
 			if err != nil {
-				fmt.Println("tcp: Error accepting: ", err.Error())
+				l.Log.Error().Msgf("tcp: Error accepting: %v", err.Error())
 				os.Exit(1)
 			}
 			fmt.Println("tcp: Connected to client: ", conn.RemoteAddr().String())
@@ -50,7 +51,7 @@ func StartTCPServer(db *sql.DB, commandChannel <-chan types.CommandRequest, comm
 		mut.Unlock()
 
 		if ok {
-			fmt.Printf("tcp: Sending command: %d to datasource: %d\n", command.Command, command.DatasourceId)
+			l.Log.Info().Msgf("tcp: Sending command: %d to datasource: %d", command.Command, command.DatasourceId)
 			err := sendCommand(conn, command.Command)
 			commandResponseChannel <- types.CommandResponse{
 				Id:           command.Id,
@@ -59,7 +60,7 @@ func StartTCPServer(db *sql.DB, commandChannel <-chan types.CommandRequest, comm
 				Error:        err,
 			}
 		} else {
-			fmt.Printf("tcp: No connection found for datasource: %d\n", command.DatasourceId)
+			l.Log.Warn().Msgf("tcp: No connection found for datasource: %d", command.DatasourceId)
 			commandResponseChannel <- types.CommandResponse{
 				Id:           command.Id,
 				Command:      command.Command,
@@ -78,7 +79,7 @@ func handleConnection(conn net.Conn, pg_db *sql.DB) {
 		if current, ok := connections[datasourceId]; ok && current == conn {
 			delete(connections, datasourceId)
 			updateDatasourceStatus(pg_db, datasourceId, "DISCONNECTED")
-			fmt.Printf("tcp: Removed connection and updated status to DISCONNECTED for datasource %d\n", datasourceId)
+			l.Log.Info().Msgf("tcp: Removed connection and updated status to DISCONNECTED for datasource %d", datasourceId)
 		}
 		mut.Unlock()
 		conn.Close()
@@ -94,9 +95,9 @@ func handleConnection(conn net.Conn, pg_db *sql.DB) {
 
 		if err != nil {
 			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
-				fmt.Printf("tcp: Timeout on connection for datasource %d: %s\n", datasourceId, err.Error())
+				l.Log.Error().Msgf("tcp: Timeout on connection for datasource %d: %s", datasourceId, err.Error())
 			} else {
-				fmt.Printf("tcp: Error on connection for datasource %d: %s\n", datasourceId, err.Error())
+				l.Log.Error().Msgf("tcp: Error on connection for datasource %d: %s", datasourceId, err.Error())
 			}
 			return
 		}
@@ -109,12 +110,12 @@ func handleConnection(conn net.Conn, pg_db *sql.DB) {
 			mut.Lock()
 			existingConn, exists := connections[datasourceId]
 			if exists {
-				fmt.Printf("tcp: Connection updated for datasource %d\n", datasourceId)
+				l.Log.Info().Msgf("tcp: Connection updated for datasource %d", datasourceId)
 				if existingConn != conn {
 					existingConn.Close()
 				}
 			} else {
-				fmt.Printf("tcp: New Connection added for datasource %d\n", datasourceId)
+				l.Log.Info().Msgf("tcp: New Connection added for datasource %d", datasourceId)
 			}
 			connections[datasourceId] = conn
 			updateDatasourceStatus(pg_db, datasourceId, "CONNECTED")
@@ -128,7 +129,7 @@ func handleConnection(conn net.Conn, pg_db *sql.DB) {
 			value := values[i]
 			db.IngestIotData(pg_db, datasourceId, picow_value_descr[i], value, currTimestamp)
 		}
-		fmt.Println("tcp: Successfully inserted message")
+		l.Log.Debug().Msg("tcp: Successfully inserted message")
 	}
 }
 
@@ -140,7 +141,7 @@ func parseCsv(message string) []int {
 	for i, value := range values {
 		intValue, err := strconv.Atoi(value)
 		if err != nil {
-			fmt.Printf("tcp: Error parsing int form string '%s': %s", value, err)
+			l.Log.Error().Msgf("tcp: Error parsing int form string '%s': %s", value, err)
 			continue
 		}
 		intValues[i] = intValue
@@ -156,13 +157,13 @@ func sendCommand(conn net.Conn, command int) error {
 
 	_, err := writer.WriteString(message)
 	if err != nil {
-		fmt.Println("tcp: Error writing command to connection:", err)
+		l.Log.Error().Msgf("tcp: Error writing command to connection: %v", err)
 		return err
 	}
 
 	err = writer.Flush()
 	if err != nil {
-		fmt.Println("tcp: Error flushing writer:", err)
+		l.Log.Error().Msgf("tcp: Error flushing writer: %v", err)
 		return err
 	}
 
@@ -173,6 +174,6 @@ func updateDatasourceStatus(db *sql.DB, datasourceId int, status string) {
 	query := `UPDATE datasources SET status = $1 WHERE id = $2`
 	_, err := db.Exec(query, status, datasourceId)
 	if err != nil {
-		fmt.Printf("tcp: Error updating status for datasource %d to %s: %s\n", datasourceId, status, err.Error())
+		l.Log.Error().Msgf("tcp: Error updating status for datasource %d to %s: %s", datasourceId, status, err.Error())
 	}
 }
