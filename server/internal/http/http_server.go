@@ -29,6 +29,8 @@ func StartHttpServer(db *sql.DB, commandChannel chan<- types.CommandRequest, com
 	router.HandleFunc("GET /api/ds/{id}/display_button", ApiDisplayButtonHandler(db))
 	router.HandleFunc("GET /api/ds/{id}/data_pane", ApiDataPaneHandler(db))
 	router.HandleFunc("GET /api/ds/{id}/logs", ApiLogHandler(db))
+	router.HandleFunc("GET /api/bridge/datasources", ApiHomeBridgeGetDatasources(db))
+	router.HandleFunc("GET /api/bridge/datasources/{id}/{metric}", ApiHomeBridgeGetMetric(db))
 	fmt.Println("Http Server listening on port 8080")
 
 	loggedRouter := LoggerMiddleware(router)
