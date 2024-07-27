@@ -52,7 +52,7 @@ func ApiDisplayButtonHandler(db *sql.DB) http.HandlerFunc {
 		display_status, err := getDisplayStatus(db, dsId)
 
 		if err != nil {
-			l.Log.Error().Msgf("Error fetching display_status: ", err)
+			l.Log.Error().Msgf("Error fetching display_status: %v", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}

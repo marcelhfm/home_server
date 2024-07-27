@@ -5,8 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
+	"github.com/google/uuid"
 	l "github.com/marcelhfm/home_server/pkg/log"
+	"github.com/marcelhfm/home_server/pkg/types"
 )
 
 // Get all datasource
@@ -99,5 +102,47 @@ func ApiHomeBridgeGetMetric(db *sql.DB) http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(*metricObj)
+	}
+}
+
+// Co2 command
+
+func ApiHomeBridgeSendTcpCommand(commandChannel chan<- types.CommandRequest, commandResponseChannel <-chan types.CommandResponse) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := r.PathValue("id")
+
+		datasourceId, err := strconv.Atoi(id)
+		if err != nil {
+			l.Log.Warn().Msgf("Invalid id. err: %v", err)
+			http.Error(w, "Invalid command", http.StatusBadRequest)
+			return
+		}
+
+		cmd := r.PathValue("cmd")
+
+		commandCode, ok := commandMap[cmd]
+		if !ok {
+			l.Log.Warn().Msgf("Unknown command. err: %v", err)
+			http.Error(w, "Unknown command", http.StatusBadRequest)
+			return
+		}
+
+		rq := types.CommandRequest{
+			Id:           uuid.New(),
+			Command:      commandCode,
+			DatasourceId: datasourceId,
+		}
+
+		l.Log.Info().Msgf("Send command %d to datasource with id: %d", rq.Command, rq.DatasourceId)
+		commandChannel <- rq
+
+		response := <-commandResponseChannel
+
+		if response.Error != nil {
+			l.Log.Error().Msgf("Error sending command. err: %v", response.Error)
+			http.Error(w, fmt.Sprintf("Error: %v", response.Error), http.StatusInternalServerError)
+		} else {
+			w.Write([]byte("Command sent successfully!"))
+		}
 	}
 }

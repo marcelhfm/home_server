@@ -144,7 +144,7 @@ type TimeseriesData struct {
 }
 
 func getTimeseriesData(db *sql.DB, dsId string, dsType string) ([]TimeseriesData, error) {
-	l.Log.Info().Msgf("Fetching timeseries data for ds", dsId)
+	l.Log.Info().Msgf("Fetching timeseries data for ds: %s", dsId)
 
 	var timeseriesQuery string
 

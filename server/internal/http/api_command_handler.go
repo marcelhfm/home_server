@@ -2,7 +2,6 @@ package http
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -50,7 +49,7 @@ func ApiCommandHandler(commandChannel chan<- types.CommandRequest, commandRespon
 			DatasourceId: datasourceId,
 		}
 
-		log.Printf("Send command %d to datasource with id: %d", rq.Command, rq.DatasourceId)
+		l.Log.Info().Msgf("Send command %d to datasource with id: %d", rq.Command, rq.DatasourceId)
 		commandChannel <- rq
 
 		response := <-commandResponseChannel

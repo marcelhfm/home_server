@@ -19,7 +19,7 @@ type LogData struct {
 }
 
 func getLogs(db *sql.DB, dsId string, timerange string, level string) ([]LogData, error) {
-	l.Log.Info().Msgf("Fetching logs for ds", dsId)
+	l.Log.Info().Msgf("Fetching logs for ds %s", dsId)
 
 	var where_level string = ""
 
