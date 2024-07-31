@@ -6,11 +6,11 @@
 
 :8085 {
 	handle /dozzle* {
-		reverse_proxy localhost:8083
+		reverse_proxy dozzle:8080
 	}
 
 	handle_path /bridge* {
-		reverse_proxy localhost:8581
+		reverse_proxy homebridge:8581
 	}
 
 	handle {
