@@ -51,7 +51,7 @@ func getLastSeen(db *sql.DB, datasources []types.Datasource) ([]types.Datasource
 		params[i] = ds.Id
 	}
 
-	getLastSeenQuery := fmt.Sprintf("SELECT timeseries.datasource_id, timestamp FROM timeseries WHERE timeseries.datasource_id IN (%s) ORDER BY timestamp DESC LIMIT 1", strings.Join(placeholder, ", "))
+	getLastSeenQuery := fmt.Sprintf(`SELECT datasource_id, MAX(timestamp) AS latest_timestamp	FROM timeseries	WHERE	datasource_id IN (%s)	GROUP BY datasource_id;`, strings.Join(placeholder, ", "))
 
 	rows, err := db.Query(getLastSeenQuery, params...)
 	if err != nil {
@@ -70,6 +70,8 @@ func getLastSeen(db *sql.DB, datasources []types.Datasource) ([]types.Datasource
 
 		foundDatasources[id] = last_seen
 	}
+
+	l.Log.Debug().Msgf("Found datasources: %v for query: %s and params %v", foundDatasources, getLastSeenQuery, params)
 
 	if err := rows.Err(); err != nil {
 		return nil, err
