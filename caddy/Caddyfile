@@ -5,14 +5,12 @@
 }
 
 :8085 {
-	handle /dozzle/* {
-		uri strip_prefix /dozzle
-		reverse_proxy dozzle:8080
+	handle_path /dozzle/* {
+		reverse_proxy localhost:8083
 	}
 
-	handle /bridge/* {
-		uri strip_prefix /bridge
-		reverse_proxy homebridge:8581
+	handle_path /bridge/* {
+		reverse_proxy localhost:8581
 	}
 
   reverse_proxy /* server:8080
