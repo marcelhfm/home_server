@@ -39,9 +39,6 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     restart: always
-    depends_on:
-      - server
-      - grafana
 
   mosquitto:
     image: eclipse-mosquitto:latest
