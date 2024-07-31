@@ -5,8 +5,15 @@
 }
 
 :8085 {
-  reverse_proxy /bridge/* homebridge:8581
-  reverse_proxy /db/* timescaledb:5432
+	handle /dozzle/* {
+		uri strip_prefix /dozzle
+		reverse_proxy dozzle:8080
+	}
+
+	handle /bridge/* {
+		uri strip_prefix /bridge
+		reverse_proxy homebridge:8581
+	}
 
   reverse_proxy /* server:8080
 }

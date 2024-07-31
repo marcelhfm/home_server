@@ -102,7 +102,7 @@ func handleConnection(conn net.Conn, pg_db *sql.DB) {
 			return
 		}
 
-		fmt.Printf("tcp: Received message: %s", message)
+		l.Log.Debug().Msgf("tcp: Received message: %s", message)
 		values := parseCsv(message)
 
 		if isFirstMessage {
