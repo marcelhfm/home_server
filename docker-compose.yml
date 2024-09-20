@@ -43,9 +43,9 @@ services:
   mosquitto:
     image: eclipse-mosquitto:latest
     container_name: mosquitto
-    ports: 
+    ports:
       - "1883:1883"
-    volumes: 
+    volumes:
       - "./mosquitto/config:/mosquitto/config"
       - "./mosquitto/data:/mosquitto/data"
       - "./mosquitto/log:/mosquitto/log"
@@ -71,13 +71,11 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 8083:8080
-    environment: 
+    environment:
       DOZZLE_BASE: /dozzle
 
 volumes:
   timescaledb-data:
-    driver: local
-  grafana_data:
     driver: local
   caddy_data:
     driver: local

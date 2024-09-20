@@ -11,30 +11,11 @@ import (
 )
 
 func Init_pq() *sql.DB {
-	host, err := config.GetenvStr("PQ_HOST")
-	if err != nil {
-		l.Log.Error().Msgf("Error while getting env: %v", err)
-	}
-
-	port, err := config.GetenvInt("PQ_PORT")
-	if err != nil {
-		l.Log.Error().Msgf("Error while getting env: %v", err)
-	}
-
-	user, err := config.GetenvStr("PQ_USER")
-	if err != nil {
-		l.Log.Error().Msgf("Error while getting env: %v", err)
-	}
-
-	password, err := config.GetenvStr("PQ_PASSWORD")
-	if err != nil {
-		l.Log.Error().Msgf("Error while getting env: %v", err)
-	}
-
-	dbname, err := config.GetenvStr("PQ_DBNAME")
-	if err != nil {
-		l.Log.Error().Msgf("Error while getting env: %v", err)
-	}
+	host := config.GetenvStr("PQ_HOST")
+	port := config.GetenvInt("PQ_PORT")
+	user := config.GetenvStr("PQ_USER")
+	password := config.GetenvStr("PQ_PASSWORD")
+	dbname := config.GetenvStr("PQ_DBNAME")
 
 	psqlError := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname,
