@@ -50,7 +50,7 @@ var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err
 
 	for i := 0; i < maxRetries; i++ {
 		if token := client.Connect(); token.Wait() && token.Error() == nil {
-			l.Log.Debug().Msg("MQTT: Successfully reconnected to mqtt broker.\n")
+			l.Log.Debug().Msg("MQTT: Successfully reconnected to mqtt broker.")
 			break
 		} else {
 			l.Log.Error().Msgf("MQTT: Reconnection error %v", token.Error())
