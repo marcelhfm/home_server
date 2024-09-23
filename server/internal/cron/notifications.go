@@ -90,12 +90,10 @@ func shouldSendNotification(notificationKey string) bool {
 			bouncy = &Bouncy{}
 			statefulBouncies[notificationKey] = bouncy
 		}
-		l.Log.Debug().Msgf("Bouncy before %v", bouncy)
 
 		bouncy.lastNotif = time.Now()
 		bouncy.threshholdReached = false
 
-		l.Log.Debug().Msgf("Bouncy after %v", bouncy)
 		l.Log.Info().Msgf("I should send a notification for %s", notificationKey)
 		return true
 	}
