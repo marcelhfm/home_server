@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/marcelhfm/home_server/pkg/config"
@@ -18,6 +19,19 @@ type MetricsData struct {
 	Metric       string
 	Value        int
 }
+
+type Bouncy struct {
+	lastNotif         time.Time
+	threshholdReached bool
+}
+
+var (
+	statefulBouncies = make(map[string]*Bouncy)
+	debounce         = 10 * time.Minute
+	mu               sync.Mutex
+)
+
+const DEBOUNCE_DEFAULT = 10 * time.Minute
 
 func sendPush(title string, message string) {
 	pushUser := config.GetenvStr("PUSHOVER_USER")
@@ -65,6 +79,29 @@ func sendPush(title string, message string) {
 	}
 }
 
+func shouldSendNotification(notificationKey string) bool {
+	mu.Lock()
+	defer mu.Unlock()
+
+	bouncy, exists := statefulBouncies[notificationKey]
+
+	if !exists || (time.Since(bouncy.lastNotif) > DEBOUNCE_DEFAULT && bouncy.threshholdReached) {
+		if !exists {
+			bouncy = &Bouncy{}
+			statefulBouncies[notificationKey] = bouncy
+		}
+
+		bouncy.lastNotif = time.Now()
+		bouncy.threshholdReached = false
+
+		l.Log.Info().Msgf("I should send a notification for %s", notificationKey)
+		return true
+	}
+
+	l.Log.Info().Msgf("I should NOT send a notification for %s", notificationKey)
+	return false
+}
+
 func Notifications(db *sql.DB) {
 	l.Log.Info().Msg("Notifications: Checking timeseries data...")
 	lastMetricsQuery := `
@@ -74,6 +111,7 @@ func Notifications(db *sql.DB) {
       value,
       timestamp
   FROM timeseries
+  WHERE timestamp >= NOW() - INTERVAL '8 hours'
   ORDER BY datasource_id, metric, timestamp DESC;`
 
 	rows, err := db.Query(lastMetricsQuery)
@@ -100,13 +138,39 @@ func Notifications(db *sql.DB) {
 	}
 
 	for _, metricsData := range res {
+		notificationKey := fmt.Sprintf("%s_%s", metricsData.DatasourceId, metricsData.Metric)
+		bouncy, exists := statefulBouncies[notificationKey]
+		if !exists {
+			bouncy = &Bouncy{threshholdReached: true, lastNotif: time.Now().Add(-DEBOUNCE_DEFAULT)} // inital threshold is reached and last notif is before default debounce
+			statefulBouncies[notificationKey] = bouncy
+		}
+
 		if metricsData.Metric == "co2" && metricsData.Value >= 1200 {
 			message := fmt.Sprintf("Öffne ein Fenster! Aktuelle ppm: %d", metricsData.Value)
-			sendPush("Schlechte Luft", message)
+
+			if shouldSendNotification(notificationKey) {
+				sendPush("Schlechte Luft", message)
+			}
+
+			if metricsData.Value < 1000 {
+				mu.Lock()
+				bouncy.threshholdReached = true
+				mu.Unlock()
+			}
 		}
+
 		if metricsData.Metric == "moisture" && metricsData.Value <= 4000 {
 			message := fmt.Sprintf("Pflanze mit id %s. Letzter Messwert: %d%%", metricsData.DatasourceId, metricsData.Value/100)
-			sendPush("Eine Pflanze benötigt Wasser", message)
+
+			if shouldSendNotification(notificationKey) {
+				sendPush("Eine Pflanze benötigt Wasser", message)
+			}
+
+			if metricsData.Value > 5500 {
+				mu.Lock()
+				bouncy.threshholdReached = true
+				mu.Unlock()
+			}
 		}
 	}
 }
