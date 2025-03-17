@@ -5,7 +5,7 @@
 }
 
 :8085 {
-	handle /dozzle* {
+	handle /logs* {
 		reverse_proxy dozzle:8080
 	}
 
